@@ -1,0 +1,2 @@
+opennlp SentenceDetectorEvaluator -model sentenceDetector\en-sent.bin -lang en -data sentenceDetector\en-sent.eval -encoding UTF-8
+opennlp SentenceDetector sentenceDetector\en-sent.bin ^<sentenceDetector\test.txt^> sentenceDetector\test2.txt

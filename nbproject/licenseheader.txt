@@ -1,0 +1,8 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}This base of this source code was originally taken from Apache's OpenNLP Documentation.
+${licensePrefix}Development by Imballinst (imballinst.github.io)
+<#if licenseLast??>
+${licenseLast}
+</#if>
