@@ -6,6 +6,7 @@ package if4091.ta;
 
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +34,9 @@ public class IF4091TA {
      * @throws java.io.FileNotFoundException
      */
     public static void main(String[] args) throws IOException {
+        // Instantiate class
+        IF4091TA trainer = new IF4091TA();
+        
         // Variables
         String projectDirectory = System.getProperty("user.dir");
         String trainingDataDirectory = projectDirectory + "\\src\\if4091\\training-data\\";
@@ -40,20 +44,17 @@ public class IF4091TA {
         Charset charset = Charset.forName("UTF-8");				
         
         // Train
-        trainSentenceDetector(trainingDataDirectory, modelDataDirectory, charset);
+        trainer.trainSentenceDetector(trainingDataDirectory, modelDataDirectory, charset);
     }
     
     /**
      *
-     * @param sourceDirectory
-     * @param modelDirectory
+     * @param trainingDataDirectory
+     * @param modelDataDirectory
      * @param charset
      * @throws IOException
      */
-    public static void trainSentenceDetector(String trainingDataDirectory, String modelDataDirectory, Charset charset) throws IOException {
-        // Model exact directory
-        String sentenceDetectorModelDirectory = modelDataDirectory + "\\sentenceDetector\\";
-        
+    public void trainSentenceDetector(String trainingDataDirectory, String modelDataDirectory, Charset charset) throws IOException {
         // Local variables for model
         ObjectStream<String> lineStream = new PlainTextByLineStream(new FileInputStream(trainingDataDirectory + "en-sent.train"), charset);
         ObjectStream<SentenceSample> sampleStream = new SentenceSampleStream(lineStream);
@@ -61,10 +62,6 @@ public class IF4091TA {
         char[] eos = {';', '.', '!', '?' };
         Dictionary dic = new Dictionary();
         OutputStream modelOut = null;
-        
-        // Local variables for copying training data to evaluation data
-        FileChannel src = new FileInputStream(trainingDataDirectory + "en-sent.train").getChannel();
-        FileChannel dest = new FileOutputStream(sentenceDetectorModelDirectory + "en-sent.eval").getChannel();
         
         // Train the model using the training data
         try {
@@ -75,18 +72,30 @@ public class IF4091TA {
         }
         
         try {
-            // Copy the content from src to dest
-            dest.transferFrom(src, 0, src.size());
+            // Copy files
+            copyFiles(trainingDataDirectory, modelDataDirectory);
             
             // Create the model file
-            modelOut = new BufferedOutputStream(new FileOutputStream(sentenceDetectorModelDirectory + "en-sent.bin"));
+            modelOut = new BufferedOutputStream(new FileOutputStream(modelDataDirectory + "\\sentenceDetector\\en-sent.bin"));
             model.serialize(modelOut);
         } finally {
             if (modelOut != null) {
                 modelOut.close();
-                src.close();
-                dest.close();
             }
+        }
+    }
+    
+    public void copyFiles(String srcPath, String destPath) throws FileNotFoundException, IOException {
+        // Local variables for copying training data to evaluation data
+        FileChannel src = new FileInputStream(srcPath + "en-sent.train").getChannel();
+        FileChannel dest = new FileOutputStream(destPath + "\\sentenceDetector\\en-sent.eval").getChannel();
+        
+        try {
+            // Copy the content from src to dest
+            dest.transferFrom(src, 0, src.size());
+        } finally {
+            src.close();
+            dest.close();
         }
     }
 }
