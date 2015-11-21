@@ -24,7 +24,7 @@ public class IF4091TA {
         // Variables
         String projectDirectory = System.getProperty("user.dir");
         String trainingDataDirectory = projectDirectory + "\\src\\if4091\\training-data\\";
-        String modelDataDirectory = projectDirectory + "\\src\\if4091\\model\\";
+        String modelDataDirectory = projectDirectory + "\\model\\";
         Charset charset = Charset.forName("UTF-8");				
         
         // Train
