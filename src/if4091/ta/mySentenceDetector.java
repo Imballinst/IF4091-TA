@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.sentdetect.SentenceDetectorFactory;
 import opennlp.tools.sentdetect.SentenceDetectorME;
@@ -69,13 +73,25 @@ public class mySentenceDetector {
         // Local variables for copying training data to evaluation data
         FileChannel src = new FileInputStream(srcPath + "id-sent.train").getChannel();
         FileChannel dest = new FileOutputStream(destPath + "\\sentenceDetector\\id-sent.eval").getChannel();
+        FileChannel dest2 = new FileOutputStream(destPath + "\\sentenceDetector\\test.txt").getChannel();
         
         try {
             // Copy the content from src to dest
             dest.transferFrom(src, 0, src.size());
+            src.position(0);
+            dest2.transferFrom(src, 0, src.size());
         } finally {
             src.close();
             dest.close();
         }
+        
+        // replace test.txt newlines with whitespaces
+        
+        Path path = Paths.get(destPath + "\\sentenceDetector\\test.txt");
+        Charset charset = StandardCharsets.UTF_8;
+
+        String content = new String(Files.readAllBytes(path), charset);
+        content = content.replaceAll("\n", " ");
+        Files.write(path, content.getBytes(charset));
     }
 }
