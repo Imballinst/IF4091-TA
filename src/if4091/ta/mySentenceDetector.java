@@ -36,7 +36,7 @@ public class mySentenceDetector {
      */
     public void trainSentenceDetector(String trainingDataDirectory, String modelDataDirectory, Charset charset) throws IOException {
         // Local variables for model
-        ObjectStream<String> lineStream = new PlainTextByLineStream(new FileInputStream(trainingDataDirectory + "en-sent.train"), charset);
+        ObjectStream<String> lineStream = new PlainTextByLineStream(new FileInputStream(trainingDataDirectory + "id-sent.train"), charset);
         ObjectStream<SentenceSample> sampleStream = new SentenceSampleStream(lineStream);
         SentenceModel model;
         char[] eos = {';', '.', '!', '?' };
@@ -56,7 +56,7 @@ public class mySentenceDetector {
             copyFiles(trainingDataDirectory, modelDataDirectory);
             
             // Create the model file
-            modelOut = new BufferedOutputStream(new FileOutputStream(modelDataDirectory + "\\sentenceDetector\\en-sent.bin"));
+            modelOut = new BufferedOutputStream(new FileOutputStream(modelDataDirectory + "\\sentenceDetector\\id-sent.bin"));
             model.serialize(modelOut);
         } finally {
             if (modelOut != null) {
@@ -67,8 +67,8 @@ public class mySentenceDetector {
     
     public void copyFiles(String srcPath, String destPath) throws FileNotFoundException, IOException {
         // Local variables for copying training data to evaluation data
-        FileChannel src = new FileInputStream(srcPath + "en-sent.train").getChannel();
-        FileChannel dest = new FileOutputStream(destPath + "\\sentenceDetector\\en-sent.eval").getChannel();
+        FileChannel src = new FileInputStream(srcPath + "id-sent.train").getChannel();
+        FileChannel dest = new FileOutputStream(destPath + "\\sentenceDetector\\id-sent.eval").getChannel();
         
         try {
             // Copy the content from src to dest

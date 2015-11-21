@@ -5,6 +5,7 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>IF4091-TA</name>
             <source-roots>
+                <root id="src.doc.dir" name="Documentations"/>
                 <root id="src.dir"/>
             </source-roots>
             <test-roots>
