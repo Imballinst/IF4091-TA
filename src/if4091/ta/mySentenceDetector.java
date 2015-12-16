@@ -5,6 +5,7 @@
 package if4091.ta;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -22,6 +23,7 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.sentdetect.SentenceSample;
 import opennlp.tools.sentdetect.SentenceSampleStream;
+import opennlp.tools.util.MarkableFileInputStreamFactory;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.PlainTextByLineStream;
 import opennlp.tools.util.TrainingParameters;
@@ -40,8 +42,10 @@ public class mySentenceDetector {
      */
     public void trainSentenceDetector(String trainingDataDirectory, String modelDataDirectory, Charset charset) throws IOException {
         // Local variables for model
-        ObjectStream<String> lineStream = new PlainTextByLineStream(new FileInputStream(trainingDataDirectory + "id-sent.train"), charset);
+        File f = new File(trainingDataDirectory + "id-sent.train");
+        ObjectStream<String> lineStream = new PlainTextByLineStream(new MarkableFileInputStreamFactory(f), charset);
         ObjectStream<SentenceSample> sampleStream = new SentenceSampleStream(lineStream);
+        
         SentenceModel model;
         char[] eos = {';', '.', '!', '?' };
         Dictionary dic = new Dictionary();
