@@ -1,0 +1,1 @@
+apache-opennlp-1.6.0\bin\opennlp Doccat categorizer\id-cat.bin ^<categorizer\test.txt^> categorizer\test2.txt

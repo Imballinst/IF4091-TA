@@ -19,7 +19,8 @@ public class IF4091TA {
      */
     public static void main(String[] args) throws IOException {
         // Instantiate class
-        mySentenceDetector sentenceDetector = new mySentenceDetector();
+//        MySentenceDetector sentenceDetector = new MySentenceDetector();
+        MyCategorizer categorizer = new MyCategorizer();
         
         // Variables
         String projectDirectory = System.getProperty("user.dir");
@@ -28,6 +29,7 @@ public class IF4091TA {
         Charset charset = Charset.forName("UTF-8");				
         
         // Train
-        sentenceDetector.trainSentenceDetector(trainingDataDirectory, modelDataDirectory, charset);
+//        sentenceDetector.trainSentenceDetector(trainingDataDirectory, modelDataDirectory, charset);
+        categorizer.trainDocumentCategorizer(trainingDataDirectory, modelDataDirectory, charset);
     }
 }
