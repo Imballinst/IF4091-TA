@@ -50,7 +50,7 @@ public class MyCategorizer {
         
         // Train the model using the training data
         try {
-            model = DocumentCategorizerME.train("en", sampleStream, TrainingParameters.defaultParams(), new DoccatFactory());
+            model = DocumentCategorizerME.train("id", sampleStream, TrainingParameters.defaultParams(), new DoccatFactory());
         }
         finally {
             sampleStream.close();
@@ -97,5 +97,15 @@ public class MyCategorizer {
         }
         
         Files.write(path, newcontent.getBytes(charset));
+    }
+    
+    public void detectCategory(String trainingDataDirectory, String modelDataDirectory, String word) throws IOException {
+        FileInputStream inputStream = new FileInputStream(modelDataDirectory + "\\categorizer\\id-cat.bin");
+        DoccatModel docCatModel = new DoccatModel(inputStream);
+        DocumentCategorizerME myCategorizer = new DocumentCategorizerME(docCatModel);
+        
+        double[] outcomes = myCategorizer.categorize(word);
+        String category = myCategorizer.getBestCategory(outcomes);
+        System.out.println(category);
     }
 }

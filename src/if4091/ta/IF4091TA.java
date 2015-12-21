@@ -6,6 +6,7 @@ package if4091.ta;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Scanner;
 
 /**
  *
@@ -31,5 +32,12 @@ public class IF4091TA {
         // Train
 //        sentenceDetector.trainSentenceDetector(trainingDataDirectory, modelDataDirectory, charset);
         categorizer.trainDocumentCategorizer(trainingDataDirectory, modelDataDirectory, charset);
+        String input = "";
+        Scanner in = new Scanner(System.in);
+        do {
+            System.out.print("Enter your desired word: ");
+            input = in.nextLine();
+            categorizer.detectCategory(trainingDataDirectory, modelDataDirectory, input);
+        } while (input.compareTo("q") != 0);
     }
 }
