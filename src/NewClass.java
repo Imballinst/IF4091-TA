@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class NewClass {
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException {
         IndonesianPOSTagger ipostag = new IndonesianPOSTagger();
-        String teks = "hal ini sangat abnormal";
+        String teks = "Indonesia / Amerika senang bermain voli, basket, dan sepakbola.";
         ArrayList<String[]> str = ipostag.doPOSTag(teks);
         int n = str.size();
         for(int i=0; i<n; i++)
