@@ -1,7 +1,3 @@
-/*
- * This base of this source code was originally taken from Apache's OpenNLP Documentation.
- * Development by Imballinst (imballinst.github.io)
- */
 package if4091.test;
 
 import java.io.File;

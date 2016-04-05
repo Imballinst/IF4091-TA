@@ -1,15 +1,11 @@
-/*
- * This base of this source code was originally taken from Apache's OpenNLP Documentation.
- * Development by Imballinst (imballinst.github.io)
- */
 package if4091.test;
-
-import java.util.Arrays;
 
 /**
  *
  * @author Imballinst
  */
+import java.util.Arrays;
+
 public class SentenceDistance {
     private static int minimum(int a, int b, int c) {
         return Math.min(Math.min(a, b), c);

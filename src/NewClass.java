@@ -1,12 +1,3 @@
-/*
- * This base of this source code was originally taken from Apache's OpenNLP Documentation.
- * Development by Imballinst (imballinst.github.io)
- */
-
-/**
- *
- * @author Imballinst
- */
 import java.util.ArrayList;
 
 /**
