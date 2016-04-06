@@ -1,5 +1,5 @@
 /**
- * This algorithm and its implementation are created by Simon White.
+ * This original algorithm and its implementation are created by Simon White.
  * View his article on: http://www.catalysoft.com/articles/StrikeAMatch.html
  */
 
@@ -13,8 +13,8 @@ import java.util.ArrayList;
 
 public class LetterPairSimilarity {
     public static double compareStrings(String str1, String str2) {
-        ArrayList pairs1 = wordLetterPairs(str1.toUpperCase());
-        ArrayList pairs2 = wordLetterPairs(str2.toUpperCase());
+        ArrayList<String> pairs1 = wordLetterPairs(str1.toUpperCase());
+        ArrayList<String> pairs2 = wordLetterPairs(str2.toUpperCase());
         int intersection = 0;
         int union = pairs1.size() + pairs2.size();
         for (int i=0; i<pairs1.size(); i++) {
@@ -31,16 +31,16 @@ public class LetterPairSimilarity {
         return (2.0*intersection)/union;
     }
    
-    private static ArrayList wordLetterPairs(String str) {
-        ArrayList allPairs = new ArrayList();
+    private static ArrayList<String> wordLetterPairs(String str) {
+        ArrayList<String> allPairs = new ArrayList<>();
         // Tokenize the string and put the tokens/words into an array
         String[] words = str.split("\\s");
         // For each word
-        for (int w=0; w < words.length; w++) {
+        for (String word : words) {
             // Find the pairs of characters
-            String[] pairsInWord = letterPairs(words[w]);
-            for (int p=0; p < pairsInWord.length; p++) {
-                allPairs.add(pairsInWord[p]);
+            String[] pairsInWord = letterPairs(word);
+            for (String pairsInWord1 : pairsInWord) {
+                allPairs.add(pairsInWord1);
             }
         }
         return allPairs;

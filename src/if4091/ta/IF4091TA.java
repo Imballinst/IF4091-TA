@@ -1,7 +1,3 @@
-/*
- * This base of this source code was originally taken from Apache's OpenNLP Documentation.
- * Development by Imballinst (imballinst.github.io)
- */
 package if4091.ta;
 
 import java.io.IOException;
@@ -19,6 +15,9 @@ public class IF4091TA {
      * @throws java.io.FileNotFoundException
      */
     public static void main(String[] args) throws IOException {
-        
+        String txt1 = "Setengah dari populasi.";
+        String txt2 = "Dua puluh lima ribu orang dewasa.";
+        double d = LetterPairSimilarity.compareStrings(txt1, txt2);
+        System.out.println(d);
     }
 }
