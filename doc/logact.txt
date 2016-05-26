@@ -1,0 +1,36 @@
+## Log Activity
+
+Moodle Essay Question Grading (https://docs.moodle.org/23/en/Essay_question_type#Question_grading)
+  Question grading
+    The essay question will not be assigned a grade until it has been reviewed by a teacher and manually graded. Until that happens, the student's grade will be 0.
+  Essay questions in a Lesson
+    To grade lesson essay questions, first click on the name of the lesson in your course page. If there are essay questions to be graded, there will be a link saying "Grade essay questions". This link will open a screen showing how many ungraded essay questions there are. Ungraded essay questions will be in listed in red. Click the link for the essay you wish to grade.
+    The essay grading screen shows the title of the question, the student's essay response, and a place you can write optional comments and give the essay a score. Click the Submit grade button to record your score and comments. Graded questions will be displayed in green. Repeat the process to finish grading. Click the "Email graded essays" link to email your responses to your students. 
+		To grade a student's answer in a quiz, follow the 'manual grading' link under quiz results in the navigation block. When manually grading an essay question, the grader is able to enter a custom comment in response to the essay and assign a score for the essay
+	Intinya -> Grading masih manual. Pengembangan grader essay ini sangat feasible untuk ditambahkan sebagai plugin pada Moodle.
+
+Moodle plugin: Standard plugin & Local plugin
+  Standard plugin = bawaan Moodle, memiliki file structure yang sedemikian, kalau tidak, nggak bisa dijalankan oleh sitem
+  Local plugin = custom Plugin, tidak memerlukan file structure yang terlalu ketat, karena tidak perlu diupdate berkala
+  Perbedaan:
+    dieksekusi terakhir
+    diharapkan menggunakan event handler
+    dapat menambahkan settingan admin pada halaman settings manapun
+    tidak perlu memiliki UI
+
+Ekstensi plugin standard atau membuat plugin local?
+  Calon standard plugin yang mungkin dapat digunakan: tidak ada
+  Kesimpulan -> Buat plugin local, atau mungkin buat standard plugin
+
+Mod yang berisi tentang grading esay
+  mod/lesson/essay.php
+
+Database table
+  moodle -> mdl_question
+  moodle -> mdl_question_attempts
+    mdl_question_attempts: questionusageid diambil dari mdl_question_usages, setiap attempt berubah
+  moodle -> mdql_qtype_essay_options
+    kolom "graderinfo" berfungsi untuk memberikan informasi mengenai jawaban
+
+Dalam Moodle, terdapat Question Name, Question Text, General Feedback, Information for Graders (untuk tipe soal essay),
+              terdapat Question Name, Question Text, General Feedback, dan pilihan jawaban yang mungkin (untuk tipe soal short answer, dengan persentase sedemikian rupa, tetapi lagi-lagi, harus sama setiap karakter, apabila berbeda, terhitung salah).

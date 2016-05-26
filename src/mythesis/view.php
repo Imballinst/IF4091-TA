@@ -10,4 +10,12 @@ $PAGE->set_title('My modules page title');
 $PAGE->set_heading('My modules page heading');
  
 // The rest of your code goes below this.
+$PAGE->set_context(context_system::instance());
+$PAGE->set_context(context_coursecat::instance($categoryid));
+$PAGE->set_context(context_course::instance($courseid));
+$PAGE->set_context(context_module::instance($moduleid));
+
+$PAGE->set_pagelayout('standard');
+
+$PAGE->set_heading(get_string('pluginname', 'local_myplugin'));
 ?>
