@@ -23,7 +23,7 @@ Ekstensi plugin standard atau membuat plugin local?
   Kesimpulan -> Buat plugin local, atau mungkin buat standard plugin
 
 Mod yang berisi tentang grading esay
-  mod/lesson/essay.php
+  /mod/quiz/comment.php -> tentang review dan memberikan nilai kepada question attempt peserta ujian
 
 Database table
   moodle -> mdl_question
