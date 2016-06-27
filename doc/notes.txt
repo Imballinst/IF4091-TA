@@ -1,4 +1,4 @@
-## Log Activity
+## Notes
 
 Moodle Essay Question Grading (https://docs.moodle.org/23/en/Essay_question_type#Question_grading)
   Question grading

@@ -18,18 +18,18 @@
  * Essay question type upgrade code.
  *
  * @package    qtype
- * @subpackage essay
- * @copyright  2011 The Open University
+ * @subpackage essayinagrader
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Upgrade code for the essay question type.
+ * Upgrade code for the essay with Indonesian language grader question type.
  * @param int $oldversion the version we are upgrading from.
  */
-function xmldb_qtype_essay_upgrade($oldversion) {
+function xmldb_qtype_essayinagrader_upgrade($oldversion) {
     global $CFG;
 
     // Moodle v2.8.0 release upgrade line.

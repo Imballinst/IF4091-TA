@@ -18,8 +18,8 @@
  * Upgrade library code for the essay question type.
  *
  * @package    qtype
- * @subpackage essay
- * @copyright  2010 The Open University
+ * @subpackage essayinagrader
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,10 +33,10 @@ defined('MOODLE_INTERNAL') || die();
  *
  * This class is used by the code in question/engine/upgrade/upgradelib.php.
  *
- * @copyright  2010 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_qe2_attempt_updater extends question_qtype_attempt_updater {
+class qtype_essayinagrader_qe2_attempt_updater extends question_qtype_attempt_updater {
     public function right_answer() {
         return '';
     }
