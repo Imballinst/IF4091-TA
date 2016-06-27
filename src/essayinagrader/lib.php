@@ -17,9 +17,9 @@
 /**
  * Serve question type files
  *
- * @since      Moodle 2.0
  * @package    qtype_essay
- * @copyright  Dongsheng Cai <dongsheng@moodle.com>
+ * @subpackage essayinagrader
+ * @copyright  Try Ajitiono 2016
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -41,8 +41,8 @@ defined('MOODLE_INTERNAL') || die();
  * @param array $options additional options affecting the file serving
  * @return bool
  */
-function qtype_essay_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function qtype_essayinagrader_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $CFG;
     require_once($CFG->libdir . '/questionlib.php');
-    question_pluginfile($course, $context, 'qtype_essay', $filearea, $args, $forcedownload, $options);
+    question_pluginfile($course, $context, 'qtype_essayinagrader', $filearea, $args, $forcedownload, $options);
 }

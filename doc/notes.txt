@@ -22,15 +22,21 @@ Ekstensi plugin standard atau membuat plugin local?
   Calon standard plugin yang mungkin dapat digunakan: tidak ada
   Kesimpulan -> Buat plugin local, atau mungkin buat standard plugin
 
-Mod yang berisi tentang grading esay
+Mod yang berisi tentang grading essay
   /mod/quiz/comment.php -> tentang review dan memberikan nilai kepada question attempt peserta ujian
 
 Database table
   moodle -> mdl_question
   moodle -> mdl_question_attempts
     mdl_question_attempts: questionusageid diambil dari mdl_question_usages, setiap attempt berubah
-  moodle -> mdql_qtype_essay_options
+  moodle -> mdl_qtype_essay_options
     kolom "graderinfo" berfungsi untuk memberikan informasi mengenai jawaban
 
 Dalam Moodle, terdapat Question Name, Question Text, General Feedback, Information for Graders (untuk tipe soal essay),
               terdapat Question Name, Question Text, General Feedback, dan pilihan jawaban yang mungkin (untuk tipe soal short answer, dengan persentase sedemikian rupa, tetapi lagi-lagi, harus sama setiap karakter, apabila berbeda, terhitung salah).
+
+Question behaviour essay: manuallygraded atau deferredfeedback (sama saja), sepertinya akan menggunakan manuallygraded.
+
+Perlu dicari tools untuk eksekusi Java tanpa JDK, untuk mengantisipasi apabila tidak ada JDK pada mesin host Moodle.
+
+Perlu dicari cara agar kolom rightanswer tidak NULL untuk plugin ini, apabila tidak dapat dilakukan demikian maka terpaksa pada tabel plugin dibuat sebuah kolom baru untuk jawaban yang benar.
