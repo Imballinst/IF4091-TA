@@ -15,7 +15,6 @@ Untuk menghasilkan sebuah plugin Moodle dengan tipe ujian essay, tetapi ketika p
 ### Ide Umum
 Ide umum dari modul ini adalah sebagai berikut.
 
-
 1. Memberikan POS _tag_ kepada setiap kata pada suatu kalimat,
 2. Menghilangkan kata-kata hubung,
 3. Menghilangkan pasangan kata yang sama dan memiliki POS _tag_ yang sama,
