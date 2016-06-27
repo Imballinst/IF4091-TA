@@ -18,8 +18,8 @@
  * Strings for component 'qtype_essay', language 'en', branch 'MOODLE_20_STABLE'
  *
  * @package    qtype
- * @subpackage essay
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @subpackage essayinagrader
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,12 +38,12 @@ $string['mustattach'] = 'When "no inline text" is selected, or responses are opt
 $string['mustrequire'] = 'When "no inline text" is selected, or responses are optional, you must require at least one attachment.';
 $string['mustrequirefewer'] = 'You cannot require more attachments than you allow.';
 $string['nlines'] = '{$a} lines';
-$string['pluginname'] = 'Essay';
-$string['pluginname_help'] = 'In response to a question (that may include an image) the respondent writes an answer of a paragraph or two. The essay question will not be assigned a grade until it has been reviewed by a teacher and manually graded.';
+$string['pluginname'] = 'Essay with Indonesian Language Grader';
+$string['pluginname_help'] = 'In response to a question (that may include an image) the respondent writes an answer of a paragraph or two. The essay question will be graded, but the grade is not final until it has been reviewed by a teacher.';
 $string['pluginname_link'] = 'question/type/essay';
-$string['pluginnameadding'] = 'Adding an Essay question';
-$string['pluginnameediting'] = 'Editing an Essay question';
-$string['pluginnamesummary'] = 'Allows a response of a few sentences or paragraphs. This must then be graded manually.';
+$string['pluginnameadding'] = 'Adding an Essay question with Indonesian Language Grader ';
+$string['pluginnameediting'] = 'Editing an Essay question with Indonesian Language Grader ';
+$string['pluginnamesummary'] = "Allows a response of a few sentences or paragraphs. The plugin will grade the responses, but it won't be final until the teacher reviews it.";
 $string['responsefieldlines'] = 'Input box size';
 $string['responseformat'] = 'Response format';
 $string['responseoptions'] = 'Response Options';

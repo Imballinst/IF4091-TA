@@ -18,8 +18,8 @@
  * Essay question definition class.
  *
  * @package    qtype
- * @subpackage essay
- * @copyright  2009 The Open University
+ * @subpackage essayinagrader
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -46,7 +46,7 @@ class qtype_essay_question extends question_with_responses {
 
     /** @var int The number of attachments required for a response to be complete. */
     public $attachmentsrequired;
-
+    
     public $graderinfo;
     public $graderinfoformat;
     public $responsetemplate;

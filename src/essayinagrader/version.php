@@ -18,16 +18,16 @@
  * Version information for the essay question type.
  *
  * @package    qtype
- * @subpackage essay
- * @copyright  2005 Mark Nielsen
+ * @subpackage essayinagrader
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_essay';
-$plugin->version   = 2016052300;
+$plugin->component = 'qtype_essayinagrader';
+$plugin->version   = 2016062700;
 
-$plugin->requires  = 2016051900;
+$plugin->requires  = 2016062700;
 
 $plugin->maturity  = MATURITY_STABLE;

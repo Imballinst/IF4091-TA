@@ -18,8 +18,8 @@
  * Defines the editing form for the essay question type.
  *
  * @package    qtype
- * @subpackage essay
- * @copyright  2007 Jamie Pratt me@jamiep.org
+ * @subpackage essayinagrader
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,51 +28,54 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Essay question type editing form.
+ * Essay question type with Indonesian language grader editing form.
  *
- * @copyright  2007 Jamie Pratt me@jamiep.org
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_edit_form extends question_edit_form {
+class qtype_essayinagrader_edit_form extends question_edit_form {
 
     protected function definition_inner($mform) {
-        $qtype = question_bank::get_qtype('essay');
+        $qtype = question_bank::get_qtype('essayinagrader');
 
-        $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_essay'));
+        // First segment
+        $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_essayinagrader'));
         $mform->setExpanded('responseoptions');
 
         $mform->addElement('select', 'responseformat',
-                get_string('responseformat', 'qtype_essay'), $qtype->response_formats());
+                get_string('responseformat', 'qtype_essayinagrader'), $qtype->response_formats());
         $mform->setDefault('responseformat', 'editor');
 
         $mform->addElement('select', 'responserequired',
-                get_string('responserequired', 'qtype_essay'), $qtype->response_required_options());
+                get_string('responserequired', 'qtype_essayinagrader'), $qtype->response_required_options());
         $mform->setDefault('responserequired', 1);
         $mform->disabledIf('responserequired', 'responseformat', 'eq', 'noinline');
 
         $mform->addElement('select', 'responsefieldlines',
-                get_string('responsefieldlines', 'qtype_essay'), $qtype->response_sizes());
+                get_string('responsefieldlines', 'qtype_essayinagrader'), $qtype->response_sizes());
         $mform->setDefault('responsefieldlines', 15);
         $mform->disabledIf('responsefieldlines', 'responseformat', 'eq', 'noinline');
 
         $mform->addElement('select', 'attachments',
-                get_string('allowattachments', 'qtype_essay'), $qtype->attachment_options());
+                get_string('allowattachments', 'qtype_essayinagrader'), $qtype->attachment_options());
         $mform->setDefault('attachments', 0);
 
         $mform->addElement('select', 'attachmentsrequired',
-                get_string('attachmentsrequired', 'qtype_essay'), $qtype->attachments_required_options());
+                get_string('attachmentsrequired', 'qtype_essayinagrader'), $qtype->attachments_required_options());
         $mform->setDefault('attachmentsrequired', 0);
-        $mform->addHelpButton('attachmentsrequired', 'attachmentsrequired', 'qtype_essay');
+        $mform->addHelpButton('attachmentsrequired', 'attachmentsrequired', 'qtype_essayinagrader');
         $mform->disabledIf('attachmentsrequired', 'attachments', 'eq', 0);
 
-        $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_essay'));
-        $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_essay'),
+        // Second segment
+        $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_essayinagrader'));
+        $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_essayinagrader'),
                 array('rows' => 10),  array_merge($this->editoroptions, array('maxfiles' => 0)));
-        $mform->addHelpButton('responsetemplate', 'responsetemplate', 'qtype_essay');
+        $mform->addHelpButton('responsetemplate', 'responsetemplate', 'qtype_essayinagrader');
 
-        $mform->addElement('header', 'graderinfoheader', get_string('graderinfoheader', 'qtype_essay'));
+        // Third segment
+        $mform->addElement('header', 'graderinfoheader', get_string('graderinfoheader', 'qtype_essayinagrader'));
         $mform->setExpanded('graderinfoheader');
-        $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_essay'),
+        $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_essayinagrader'),
                 array('rows' => 10), $this->editoroptions);
     }
 
@@ -92,10 +95,10 @@ class qtype_essay_edit_form extends question_edit_form {
         $draftid = file_get_submitted_draft_itemid('graderinfo');
         $question->graderinfo = array();
         $question->graderinfo['text'] = file_prepare_draft_area(
-            $draftid,           // Draftid
-            $this->context->id, // context
-            'qtype_essay',      // component
-            'graderinfo',       // filarea
+            $draftid,               // Draftid
+            $this->context->id,     // context
+            'qtype_essayinagrader', // component
+            'graderinfo',           // filarea
             !empty($question->id) ? (int) $question->id : null, // itemid
             $this->fileoptions, // options
             $question->options->graderinfo // text.
@@ -117,25 +120,25 @@ class qtype_essay_edit_form extends question_edit_form {
         // Don't allow both 'no inline response' and 'no attachments' to be selected,
         // as these options would result in there being no input requested from the user.
         if ($fromform['responseformat'] == 'noinline' && !$fromform['attachments']) {
-            $errors['attachments'] = get_string('mustattach', 'qtype_essay');
+            $errors['attachments'] = get_string('mustattach', 'qtype_essayinagrader');
         }
 
         // If 'no inline response' is set, force the teacher to require attachments;
         // otherwise there will be nothing to grade.
         if ($fromform['responseformat'] == 'noinline' && !$fromform['attachmentsrequired']) {
-            $errors['attachmentsrequired'] = get_string('mustrequire', 'qtype_essay');
+            $errors['attachmentsrequired'] = get_string('mustrequire', 'qtype_essayinagrader');
         }
 
         // Don't allow the teacher to require more attachments than they allow; as this would
         // create a condition that it's impossible for the student to meet.
         if ($fromform['attachments'] != -1 && $fromform['attachments'] < $fromform['attachmentsrequired'] ) {
-            $errors['attachmentsrequired']  = get_string('mustrequirefewer', 'qtype_essay');
+            $errors['attachmentsrequired']  = get_string('mustrequirefewer', 'qtype_essayinagrader');
         }
 
         return $errors;
     }
 
     public function qtype() {
-        return 'essay';
+        return 'essayinagrader';
     }
 }
