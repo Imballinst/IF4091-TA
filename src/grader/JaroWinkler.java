@@ -35,7 +35,7 @@
  * </p>
  */
 
-package if4091ta.grader;
+package grader;
 
 public class JaroWinkler {    
     /**
