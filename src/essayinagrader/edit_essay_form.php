@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the editing form for the essay question type.
+ * Defines the editing form for the essay question type with Indonesian language grader.
+ * Extended from Jamie Pratt's essay question code (2007).
  *
  * @package    qtype
  * @subpackage essayinagrader
@@ -29,6 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Essay question type with Indonesian language grader editing form.
+ * Extended from Jamie Pratt's essay question code (2007).
  *
  * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

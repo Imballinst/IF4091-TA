@@ -16,6 +16,7 @@
 
 /**
  * Strings for component 'qtype_essay', language 'en', branch 'MOODLE_20_STABLE'
+ * Extended from Martin Dougiamas's essay question code (1999 onwards).
  *
  * @package    qtype
  * @subpackage essayinagrader

@@ -16,6 +16,7 @@
 
 /**
  * Serve question type files
+ * Extended from Dongsheng Cai's essay question code.
  *
  * @package    qtype_essay
  * @subpackage essayinagrader

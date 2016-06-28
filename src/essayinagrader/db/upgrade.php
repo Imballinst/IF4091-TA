@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Essay question type upgrade code.
+ * Essay question type with Indonesian language grader upgrade code.
+ * Extended from The Open University's essay question code (2011).
  *
  * @package    qtype
  * @subpackage essayinagrader

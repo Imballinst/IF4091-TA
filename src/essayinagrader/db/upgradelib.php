@@ -16,6 +16,7 @@
 
 /**
  * Upgrade library code for the essay question type.
+ * Extended from The Open University's essay question code (2011).
  *
  * @package    qtype
  * @subpackage essayinagrader
@@ -32,6 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * attempts to the new question engine.
  *
  * This class is used by the code in question/engine/upgrade/upgradelib.php.
+ * Extended from The Open University's essay question code (2011).
  *
  * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

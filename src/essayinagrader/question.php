@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Essay question definition class.
+ * Essay question with Indonesian language grader definition class.
+ * Extended from The Open University's essay question code (2009).
  *
  * @package    qtype
  * @subpackage essayinagrader
@@ -30,11 +31,12 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
 
 /**
  * Represents an essay question with Indonesian language grader.
+ * Extended from The Open University's essay question code (2009).
  *
  * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_question extends question_with_responses {
+class qtype_essayinagrader_question extends question_with_responses {
 
     public $responseformat;
 
@@ -61,7 +63,7 @@ class qtype_essay_question extends question_with_responses {
      * @return qtype_essay_format_renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {
-        return $page->get_renderer('qtype_essay', 'format_' . $this->responseformat);
+        return $page->get_renderer('qtype_essayinagrader', 'format_' . $this->responseformat);
     }
 
     public function get_expected_data() {
@@ -139,7 +141,7 @@ class qtype_essay_question extends question_with_responses {
             // Response attachments visible if the question has them.
             return $this->responseformat === 'editorfilepicker';
 
-        } else if ($component == 'qtype_essay' && $filearea == 'graderinfo') {
+        } else if ($component == 'qtype_essayinagrader' && $filearea == 'graderinfo') {
             return $options->manualcomment;
 
         } else {
