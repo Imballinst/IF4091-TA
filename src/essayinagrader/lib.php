@@ -18,7 +18,7 @@
  * Serve question type files
  * Extended from Dongsheng Cai's essay question code.
  *
- * @package    qtype_essay
+ * @package    qtype
  * @subpackage essayinagrader
  * @copyright  Try Ajitiono 2016
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,7 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Checks file access for essay questions.
  *
- * @package  qtype_essay
+ * @package  qtype
+ * @subpackage essayinagrader
  * @category files
  * @param stdClass $course course object
  * @param stdClass $cm course module object

@@ -15,11 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Essay question renderer class.
+ * Essay question with Indonesian language grader renderer class.
+ * Extended from The Open University's essay question code (2009).
  *
  * @package    qtype
- * @subpackage essay
- * @copyright  2009 The Open University
+ * @subpackage essayinagrader
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,12 +29,13 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Generates the output for essay questions.
+ * Generates the output for essay questions with Indonesian language grader.
+ * Extended from The Open University's essay question code (2009).
  *
- * @copyright  2009 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_renderer extends qtype_renderer {
+class qtype_essayinagrader_renderer extends qtype_renderer {
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
 
@@ -134,7 +136,7 @@ class qtype_essay_renderer extends qtype_renderer {
 
         $question = $qa->get_question();
         return html_writer::nonempty_tag('div', $question->format_text(
-                $question->graderinfo, $question->graderinfo, $qa, 'qtype_essay',
+                $question->graderinfo, $question->graderinfo, $qa, 'qtype_essayinagrader',
                 'graderinfo', $question->id), array('class' => 'graderinfo'));
     }
 }
@@ -147,7 +149,7 @@ class qtype_essay_renderer extends qtype_renderer {
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class qtype_essay_format_renderer_base extends plugin_renderer_base {
+abstract class qtype_essayinagrader_format_renderer_base extends plugin_renderer_base {
     /**
      * Render the students respone when the question is in read-only mode.
      * @param string $name the variable name this input edits.
@@ -185,10 +187,10 @@ abstract class qtype_essay_format_renderer_base extends plugin_renderer_base {
  * @copyright  2013 Binghamton University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_format_noinline_renderer extends plugin_renderer_base {
+class qtype_essayinagrader_format_noinline_renderer extends plugin_renderer_base {
 
     protected function class_name() {
-        return 'qtype_essay_noinline';
+        return 'qtype_essayinagrader_noinline';
     }
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
@@ -208,14 +210,14 @@ class qtype_essay_format_noinline_renderer extends plugin_renderer_base {
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_format_editor_renderer extends plugin_renderer_base {
+class qtype_essayinagrader_format_editor_renderer extends plugin_renderer_base {
     protected function class_name() {
-        return 'qtype_essay_editor';
+        return 'qtype_essayinagrader_editor';
     }
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
         return html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context),
-                array('class' => $this->class_name() . ' qtype_essay_response readonly'));
+                array('class' => $this->class_name() . ' qtype_essayinagrader_response readonly'));
     }
 
     public function response_area_input($name, $qa, $step, $lines, $context) {
@@ -242,7 +244,7 @@ class qtype_essay_format_editor_renderer extends plugin_renderer_base {
 
         $output = '';
         $output .= html_writer::start_tag('div', array('class' =>
-                $this->class_name() . ' qtype_essay_response'));
+                $this->class_name() . ' qtype_essayinagrader_response'));
 
         $output .= html_writer::tag('div', html_writer::tag('textarea', s($response),
                 array('id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60)));
@@ -334,9 +336,9 @@ class qtype_essay_format_editor_renderer extends plugin_renderer_base {
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_format_editorfilepicker_renderer extends qtype_essay_format_editor_renderer {
+class qtype_essayinagrader_format_editorfilepicker_renderer extends qtype_essayinagrader_format_editor_renderer {
     protected function class_name() {
-        return 'qtype_essay_editorfilepicker';
+        return 'qtype_essayinagrader_editorfilepicker';
     }
 
     protected function prepare_response($name, question_attempt $qa,
@@ -435,19 +437,19 @@ class qtype_essay_format_editorfilepicker_renderer extends qtype_essay_format_ed
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_format_plain_renderer extends plugin_renderer_base {
+class qtype_essayinagrader_format_plain_renderer extends plugin_renderer_base {
     /**
      * @return string the HTML for the textarea.
      */
     protected function textarea($response, $lines, $attributes) {
-        $attributes['class'] = $this->class_name() . ' qtype_essay_response';
+        $attributes['class'] = $this->class_name() . ' qtype_essayinagrader_response';
         $attributes['rows'] = $lines;
         $attributes['cols'] = 60;
         return html_writer::tag('textarea', s($response), $attributes);
     }
 
     protected function class_name() {
-        return 'qtype_essay_plain';
+        return 'qtype_essayinagrader_plain';
     }
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
@@ -471,8 +473,8 @@ class qtype_essay_format_plain_renderer extends plugin_renderer_base {
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_format_monospaced_renderer extends qtype_essay_format_plain_renderer {
+class qtype_essayinagrader_format_monospaced_renderer extends qtype_essayinagrader_format_plain_renderer {
     protected function class_name() {
-        return 'qtype_essay_monospaced';
+        return 'qtype_essayinagrader_monospaced';
     }
 }
