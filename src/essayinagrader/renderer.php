@@ -145,8 +145,9 @@ class qtype_essayinagrader_renderer extends qtype_renderer {
 /**
  * A base class to abstract out the differences between different type of
  * response format.
+ * Extended from The Open University's essay question code (2009).
  *
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class qtype_essayinagrader_format_renderer_base extends plugin_renderer_base {
@@ -183,8 +184,9 @@ abstract class qtype_essayinagrader_format_renderer_base extends plugin_renderer
 /**
  * An essay format renderer for essays where the student should not enter
  * any inline response.
+ * Extended from Binghamton University's essay question code (2013).
  *
- * @copyright  2013 Binghamton University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayinagrader_format_noinline_renderer extends plugin_renderer_base {
@@ -206,8 +208,9 @@ class qtype_essayinagrader_format_noinline_renderer extends plugin_renderer_base
 /**
  * An essay format renderer for essays where the student should use the HTML
  * editor without the file picker.
+ * Extended from The Open University's essay question code (2009).
  *
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayinagrader_format_editor_renderer extends plugin_renderer_base {
@@ -332,8 +335,9 @@ class qtype_essayinagrader_format_editor_renderer extends plugin_renderer_base {
 /**
  * An essay format renderer for essays where the student should use the HTML
  * editor with the file picker.
+ * Extended from The Open University's essay question code (2009).
  *
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayinagrader_format_editorfilepicker_renderer extends qtype_essayinagrader_format_editor_renderer {
@@ -433,8 +437,9 @@ class qtype_essayinagrader_format_editorfilepicker_renderer extends qtype_essayi
 /**
  * An essay format renderer for essays where the student should use a plain
  * input box, but with a normal, proportional font.
+ * Extended from The Open University's essay question code (2009).
  *
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayinagrader_format_plain_renderer extends plugin_renderer_base {
@@ -469,8 +474,9 @@ class qtype_essayinagrader_format_plain_renderer extends plugin_renderer_base {
  * An essay format renderer for essays where the student should use a plain
  * input box with a monospaced font. You might use this, for example, for a
  * question where the students should type computer code.
+ * Extended from The Open University's essay question code (2009).
  *
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayinagrader_format_monospaced_renderer extends qtype_essayinagrader_format_plain_renderer {

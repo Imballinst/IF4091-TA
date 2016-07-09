@@ -40,3 +40,9 @@ Question behaviour essay: manuallygraded atau deferredfeedback (sama saja), sepe
 Perlu dicari tools untuk eksekusi Java tanpa JDK, untuk mengantisipasi apabila tidak ada JDK pada mesin host Moodle.
 
 Perlu dicari cara agar kolom rightanswer tidak NULL untuk plugin ini, apabila tidak dapat dilakukan demikian maka terpaksa pada tabel plugin dibuat sebuah kolom baru untuk jawaban yang benar.
+
+Apabila standard plugin, maka mod quiz juga harus diubah. Local plugin lebih cocok untuk proses-proses yang tidak membutuhkan UI.
+
+Selain plugin question type, perlu dibuat juga plugin quiz karena comment.php terpisah dari question type.
+
+Alternatif: essayinagrader extend dari essay, sehingga tabelnya tidak redundan. Tapi tetap harus buat mod quiz. Mod quiz terdapat dua pilihan, ganti langsung dari situ atau bikin yang baru.
