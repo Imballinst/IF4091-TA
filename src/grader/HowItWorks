@@ -1,23 +1,23 @@
--> Kalimat asli
+--> Kalimat asli
 
 Setengah dari populasi Amerika senang bermain sepakbola, voli, dan basket.
 Dua puluh lima ribu orang dewasa di Amerika senang bermain voli, basket, dan sepakbola.
 
--> Pemrosesan POS tag
+--> Pemrosesan POS tag
 
 Setengah/NN dari/IN populasi/NN Amerika/NNP bermain/JJ sepakbola,/NN voli,/NN dan/CC basket./NN
 Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ di/IN Amerika/NNP senang/JJ bermain/JJ voli,/NNP basket,/NN dan/CC sepakbola./NN
 
--> Menghilangkan kata-kata hubung yang tidak perlu
+--> Menghilangkan kata-kata hubung yang tidak perlu
 
 Setengah/NN populasi/NN Amerika/NNP main/JJ sepakbola/NN voli/NN basket/NN
 Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ Amerika/NNP main/JJ voli/NNP basket/NN sepakbola/NN
 
--> Dari seluruh kata dan POS tag dari kalimat pertama, iriskan dengan kalimat kedua
+--> Dari seluruh kata dan POS tag dari kalimat pertama, iriskan dengan kalimat kedua
 
 Didapatkan Amerika, main, sepakbola, voli, dan basket (5 dari 7).
 
--> Cari sinonim dari tesaurus untuk sisa kata-kata yang berbeda
+--> Cari sinonim dari tesaurus untuk sisa kata-kata yang berbeda
 
 setengah-n: seperdua, separuh
 populasi-n: (menurut tesaurus Wordnet Indonesia 1.2 tidak ada)
@@ -30,9 +30,9 @@ dewasa-jj: matang, besar, dewasa
 
 Ternyata tidak ada kalimat yang saling bersinonim, maka lanjut ke tahap berikutnya
 
--> Aplikasikan algoritma Jaro Winkler apabila masih tersisa kata yang tidak bersinonim dari tesaurus
+--> Aplikasikan algoritma Jaro Winkler apabila masih tersisa kata yang tidak bersinonim dari tesaurus
 
 Setengah/NN populasi/NN
 Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ
 
--> Kalkulasikan nilai total kesamaan, yaitu 5/7 + 0 + Jaro Winkler
+--> Kalkulasikan nilai total kesamaan, yaitu 5/7 + 0 + Jaro Winkler

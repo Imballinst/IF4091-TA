@@ -63,24 +63,22 @@ public class DBManager {
         return conn;
     }
     
-    public String getExpectedAnswer(int quizID, int questionID) throws SQLException {
+    public String getExpectedAnswer(int questionID) throws SQLException {
         PreparedStatement queryStatement = null;
-        String stringStatement = "SELECT expectedanswer FROM mdl_qtype_essayinagrader_options WHERE expectedanswer = ?";
+        String stringStatement = "SELECT expectedanswer FROM mdl_qtype_essayinagrader_options WHERE questionid = ?";
         
         Statement stmt = null;
         ResultSet rs = null;
-        String answer = "";
+        String expectedAnswer = "";
 
         try {
-            conn.setAutoCommit(false);
             queryStatement = conn.prepareStatement(stringStatement);
-            queryStatement.setInt(1, quizID);
-            queryStatement.setInt(2, questionID);
+            queryStatement.setInt(1, questionID);
             
             rs = queryStatement.executeQuery();
             
             while (rs.next()) {
-                answer = rs.getString("expectedanswer");
+                expectedAnswer = rs.getString("expectedanswer");
             }
         }
         catch (SQLException ex){
@@ -104,7 +102,50 @@ public class DBManager {
             }
         }
         
-        return answer;
+        return expectedAnswer;
+    }
+    
+    public String getResponseSummary(int questionID, int questionUsageID) throws SQLException {
+        PreparedStatement queryStatement = null;
+        String stringStatement = "SELECT responsesummary FROM mdl_question_attempts WHERE questionid = ? AND questionusageid = ?";
+        
+        Statement stmt = null;
+        ResultSet rs = null;
+        String responseSummary = "";
+
+        try {
+            queryStatement = conn.prepareStatement(stringStatement);
+            queryStatement.setInt(1, questionID);
+            queryStatement.setInt(2, questionUsageID);
+            
+            rs = queryStatement.executeQuery();
+            
+            while (rs.next()) {
+                responseSummary = rs.getString("responesSummary");
+            }
+        }
+        catch (SQLException ex){
+            // handle any errors
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+        }
+        finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException sqlEx) { } // ignore
+                rs = null;
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException sqlEx) { } // ignore
+                stmt = null;
+            }
+        }
+        
+        return responseSummary;
     }
     
     public ArrayList<String> getSynonyms(String word, char pos) {
@@ -118,7 +159,6 @@ public class DBManager {
         ArrayList<String> synonyms = new ArrayList<>();
 
         try {
-            conn.setAutoCommit(false);
             queryStatement = conn.prepareStatement(stringStatement);
             queryStatement.setString(1, wordPos);
             

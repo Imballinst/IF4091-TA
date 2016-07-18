@@ -19,9 +19,9 @@ import java.util.ArrayList;
 
 /**
  *
- * @author imballinst
+ * @author Try
  */
 public class SimilarityOutput {
-    public float similarityPercentage;
-    public ArrayList<String[]> filteredSentenceWithPOSTag;
+    public float similarityPercentage = 0f;
+    public ArrayList<String[]> filteredSentenceWithPOSTag = new ArrayList<>();
 }

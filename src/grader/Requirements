@@ -3,7 +3,7 @@
 ** Attribute 1: [float] similarityPercentage
 ** Attribute 2: [ArrayList<String[]>] filteredSentenceWithPOSTag
 
--> Kalimat asli
+--> Kalimat asli
 
 * Setengah dari populasi Amerika senang bermain sepakbola, voli, dan basket.
 
@@ -13,6 +13,8 @@ Kolom tabel: expectedanswer
 Input: [int] questionID
 Output: [String] expectedAnswer
 
+Gunakan method getExpectedAnswer dari DBManager.
+
 * Dua puluh lima ribu orang dewasa di Amerika senang bermain voli, basket, dan sepakbola.
 
 Tabel: mdl_question_attempts
@@ -21,7 +23,9 @@ Kolom tabel: responsesummary
 Input: [int] questionusageid (#attempt), [int] questionid
 Output: [String] responseSummary
 
--> Pemrosesan POS tag
+Gunakan method getResponseSummary dari DBManager.
+
+--> Pemrosesan POS tag
 
 * Setengah/NN dari/IN populasi/NN Amerika/NNP bermain/JJ sepakbola,/NN voli,/NN dan/CC basket./NN
 * Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ di/IN Amerika/NNP senang/JJ bermain/JJ voli,/NNP basket,/NN dan/CC sepakbola./NN
@@ -29,19 +33,46 @@ Output: [String] responseSummary
 Input: [String] sentence
 Output: [ArrayList<String[]>] sentenceWithPOSTag
 
-Gunakan kelas StringProcessor dan eksekusi method generatePOSTag
+Gunakan kelas generatePOSTag dari StringProcessor.
 
--> Menghilangkan kata-kata hubung yang tidak perlu
+--> Stemming setiap kata
+
+* Setengah/NN dari/IN populasi/NN Amerika/NNP main/JJ sepakbola,/NN voli,/NN dan/CC basket./NN
+* Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ di/IN Amerika/NNP senang/JJ main/JJ voli,/NNP basket,/NN dan/CC sepakbola./NN
+
+Input: [ArrayList<String[]>] sentenceWithPOSTag
+Output: [ArrayList<String[]>] stemmedSentenceWithPOSTag
+
+Gunakan kelas stemSentence dari StringProcessor.
+
+--> Menghilangkan kata-kata hubung yang tidak perlu
 
 * Setengah/NN populasi/NN Amerika/NNP main/JJ sepakbola/NN voli/NN basket/NN
 * Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ Amerika/NNP main/JJ voli/NNP basket/NN sepakbola/NN
 
-Input: [ArrayList<String[]>] sentenceWithPOSTag
+POS tag yang perlu disimpan:
+
+* NN [noun]: kata benda.
+* JJ [adjective]: kata sifat benda.
+* VB [verb]: kata kerja.
+* RB [adverb]: kata sifat kerja.
+* MD [modal]: kata modal, seperti mungkin, harus, akan.
+* DT [determiner]: kata pengenal dari kata benda, seperti <noun> ini/itu, atau setiap/semua.
+* CD [cardinal number]: angka.
+* PR [personal pronoun]: kata ganti orang.
+
+POS tag yang perlu dibuang:
+
+* UH [interjection]: contohnya err, ah, oh.
+* IN [subordinating conjunction]: (preposisi) contohnya di, pada, sekitar.
+* CC [coordinating conjunction]: contohnya dan, tetapi, atau.
+
+Input: [ArrayList<String[]>] stemmedSentenceWithPOSTag
 Output: [ArrayList<String[]>] filteredSentenceWithPOSTag
 
 Not implemented yet.
 
--> Dari seluruh kata dan POS tag dari kalimat pertama, iriskan dengan kalimat kedua
+--> Dari seluruh kata dan POS tag dari kalimat pertama, iriskan dengan kalimat kedua
 
 * Didapatkan Amerika, main, sepakbola, voli, dan basket (5 dari 7).
 
@@ -50,7 +81,7 @@ Output: [SimilarityOutput] similarityOutput
 
 Not implemented yet.
 
--> Cari sinonim dari tesaurus untuk sisa kata-kata yang berbeda
+--> Cari sinonim dari tesaurus untuk sisa kata-kata yang berbeda
 
 * setengah-n: seperdua, separuh
 * populasi-n: (menurut tesaurus Wordnet Indonesia 1.2 tidak ada)
@@ -68,7 +99,7 @@ Output: [SimilarityOutput] similarityOutput
 
 Gunakan kelas DBManager dan eksekusi method getSynonyms.
 
--> Aplikasikan algoritma Jaro Winkler apabila masih tersisa kata yang tidak bersinonim dari tesaurus
+--> Aplikasikan algoritma Jaro Winkler apabila masih tersisa kata yang tidak bersinonim dari tesaurus
 
 * Setengah/NN populasi/NN
 * Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ
@@ -78,7 +109,9 @@ Output: [SimilarityOutput] similarityOutput
 
 Not implemented yet.
 
--> Kalkulasikan nilai total kesamaan, yaitu 5/7 + 0 + Jaro Winkler
+--> Kalkulasikan nilai total kesamaan, yaitu 5/7 + 0 + Jaro Winkler
 
 Input: [float] similarityOutput[0] + [float] similarityOutput[1] + [float] similarityOutput[2]
 Output: [float] totalSimilarity
+
+Not implemented yet.

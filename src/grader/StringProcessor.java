@@ -68,5 +68,9 @@ public class StringProcessor {
 //        }
     }
     
-    
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+        StringProcessor sp = new StringProcessor();
+        String s2 = sp.stemWords("saya memberi penyampaian sedemikian rupa bagusnya!");
+        System.out.println(s2);
+    }
 }
