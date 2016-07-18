@@ -53,24 +53,29 @@ public class StringProcessor {
 //        }
     }
     
-    public String stemWords(String sentence) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-        // Reflection
-        Class fooClass = Class.forName("IndonesianStemmer");
-        Method fooMethod =
-            fooClass.getMethod("stemSentence", new Class[] { String.class });
-
-        String str =
-            (String) fooMethod.invoke(fooClass.newInstance(), sentence);
+    public ArrayList<String[]> removeUnimportantWords(ArrayList<String[]> arr) {
+        ArrayList<String[]> filteredWords = new ArrayList<>();
         
-        return str;
-//        for(String s : str2) {    
-//          System.out.println(s);
-//        }
+        // Remove UH, IN, and CC POS tag
+        for(int i = 0; i < arr.size(); i++) {
+            if (arr.get(i)[1].compareTo("UH") != 0 &&
+                arr.get(i)[1].compareTo("IN") != 0 &&
+                arr.get(i)[1].compareTo("CC") != 0) {
+                // Add to new ArrayList
+                filteredWords.add(arr.get(i));
+            }
+        }
+        
+        return filteredWords;
     }
     
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
         StringProcessor sp = new StringProcessor();
-        String s2 = sp.stemWords("saya memberi penyampaian sedemikian rupa bagusnya!");
-        System.out.println(s2);
+        String s = "Saya senang bermain bola dan kotak";
+        ArrayList<String[]> s2 = sp.generatePOSTag(s);
+        ArrayList<String[]> s3 = sp.removeUnimportantWords(s2);
+        for(String[] x : s3) {
+            System.out.println(x[0] + " " + x[1]);
+        }
     }
 }

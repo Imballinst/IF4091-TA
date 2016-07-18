@@ -35,16 +35,6 @@ Output: [ArrayList<String[]>] sentenceWithPOSTag
 
 Gunakan kelas generatePOSTag dari StringProcessor.
 
---> Stemming setiap kata
-
-* Setengah/NN dari/IN populasi/NN Amerika/NNP main/JJ sepakbola,/NN voli,/NN dan/CC basket./NN
-* Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ di/IN Amerika/NNP senang/JJ main/JJ voli,/NNP basket,/NN dan/CC sepakbola./NN
-
-Input: [ArrayList<String[]>] sentenceWithPOSTag
-Output: [ArrayList<String[]>] stemmedSentenceWithPOSTag
-
-Gunakan kelas stemSentence dari StringProcessor.
-
 --> Menghilangkan kata-kata hubung yang tidak perlu
 
 * Setengah/NN populasi/NN Amerika/NNP main/JJ sepakbola/NN voli/NN basket/NN
@@ -67,7 +57,7 @@ POS tag yang perlu dibuang:
 * IN [subordinating conjunction]: (preposisi) contohnya di, pada, sekitar.
 * CC [coordinating conjunction]: contohnya dan, tetapi, atau.
 
-Input: [ArrayList<String[]>] stemmedSentenceWithPOSTag
+Input: [ArrayList<String[]>] sentenceWithPOSTag
 Output: [ArrayList<String[]>] filteredSentenceWithPOSTag
 
 Not implemented yet.
