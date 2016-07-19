@@ -169,7 +169,7 @@ public final class DBManager {
     public ArrayList<String[]> getSynonyms(String word, String pos) {
         PreparedStatement queryStatement = null;
         String wordStatement = "SELECT wordid FROM mdl_qtype_essayinagrader_synonyms WHERE word = ? AND pos = ?";
-        String wordIDStatement = "SELECT word,pos FROM mdl_qtype_essayinagrader_synonyms WHERE wordid = ? AND word != ?";
+        String wordIDStatement = "SELECT word,pos FROM mdl_qtype_essayinagrader_synonyms WHERE wordid = ? AND word != ? AND pos = ?";
         
         ResultSet rs = null;
         int wordID = 0;
@@ -191,6 +191,7 @@ public final class DBManager {
             queryStatement = conn.prepareStatement(wordIDStatement);
             queryStatement.setInt(1, wordID);
             queryStatement.setString(2, word);
+            queryStatement.setString(3, pos);
             
             rs = queryStatement.executeQuery();
             

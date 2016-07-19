@@ -132,6 +132,18 @@ public class StringProcessor {
         return (str1[0].compareTo(str2[0]) == 0 && str1[1].compareTo(str2[1]) == 0);
     }
     
+    public boolean isSynonymSame(String[] str1, String[] str2) {
+        return (str1[0].compareTo(str2[0]) == 0 && str1[1].compareTo(str2[1]) == 0);
+    }
+    
+    public boolean isPOSTagSame(String posTag1, String posTag2) {
+        boolean isSame = false;
+        
+        
+        
+        return isSame;
+    }
+    
     /**
      *
      * @param sentenceWithPOSTag
@@ -195,6 +207,7 @@ public class StringProcessor {
                 synonyms = dbm.getSynonyms(sentenceComparison.get(j)[0], sentenceComparison.get(j)[1]);
                 while (k < synonyms.size() && !resetCycle) {
                     // Compare i with k, because i and j were compared already
+                    System.out.println(sentenceWithPOSTag.get(i) + " " + synonyms.get(k));
                     if (isSame(sentenceWithPOSTag.get(i), synonyms.get(k))) {
                         sentenceWithPOSTag.remove(i);
                         sentenceComparison.remove(j);
@@ -278,8 +291,8 @@ public class StringProcessor {
      */
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, SQLException {
         StringProcessor sp = new StringProcessor();
-        String s = "Saya senang bermain bola dan kotak";
-        String t = "Saya senang bermain bola dan kotak dan segitiga";
+        String s = "Saya layak";
+        String t = "Saya mahir";
         
         sp.processWords(s, t);
 //        ArrayList<String[]> s2 = sp.generatePOSTag(s);
