@@ -36,12 +36,14 @@ public class SimilarityOutput {
     /**
      *
      */
-    public ArrayList<String[]> filteredSentenceWithPOSTag;
+    public ArrayList<String[]> realAnswer;
 
     /**
      *
      */
-    public ArrayList<String[]> sentenceComparison;
+    public ArrayList<String[]> userAnswer;
+    
+    public NearestSynonym nearestSynonym;
     
     /**
      *
@@ -49,8 +51,9 @@ public class SimilarityOutput {
     public SimilarityOutput() {
         similarityPercentage = 0d;
         baseSentenceSize = 0;
-        filteredSentenceWithPOSTag = new ArrayList<>();
-        sentenceComparison = new ArrayList<>();
+        realAnswer = new ArrayList<>();
+        userAnswer = new ArrayList<>();
+        nearestSynonym = new NearestSynonym();
     }
     
     /**
@@ -60,7 +63,8 @@ public class SimilarityOutput {
     public SimilarityOutput(SimilarityOutput s) {
         this.similarityPercentage = s.similarityPercentage;
         this.baseSentenceSize = s.baseSentenceSize;
-        this.filteredSentenceWithPOSTag = s.filteredSentenceWithPOSTag;
-        this.sentenceComparison = s.sentenceComparison;
+        this.realAnswer = s.realAnswer;
+        this.userAnswer = s.userAnswer;
+        this.nearestSynonym = s.nearestSynonym;
     }
 }
