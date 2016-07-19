@@ -17,6 +17,7 @@ package grader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +25,18 @@ import java.util.ArrayList;
  * @author Try
  */
 public class StringProcessor {
+
+    /**
+     *
+     * @param sentence
+     * @return
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
     public ArrayList<String[]> generatePOSTag(String sentence) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
         // Reflection
         Class fooClass = Class.forName("IndonesianPOSTagger");
@@ -38,6 +51,17 @@ public class StringProcessor {
 //            System.out.println(str.get(i)[0]+"/"+str.get(i)[1]);
     }
     
+    /**
+     *
+     * @param sentence
+     * @return
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
     public ArrayList<String> splitSentences(String sentence) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
         // Reflection
         Class fooClass = Class.forName("IndonesianSentenceDetector");
@@ -53,6 +77,11 @@ public class StringProcessor {
 //        }
     }
     
+    /**
+     *
+     * @param arr
+     * @return
+     */
     public ArrayList<String[]> removeUnimportantWords(ArrayList<String[]> arr) {
         ArrayList<String[]> filteredWords = new ArrayList<>();
         
@@ -61,21 +90,207 @@ public class StringProcessor {
             if (arr.get(i)[1].compareTo("UH") != 0 &&
                 arr.get(i)[1].compareTo("IN") != 0 &&
                 arr.get(i)[1].compareTo("CC") != 0) {
-                // Add to new ArrayList
-                filteredWords.add(arr.get(i));
+                // Check duplicates
+                if (!containsWord(filteredWords, arr.get(i))) {
+                    // Add to new ArrayList
+                    filteredWords.add(arr.get(i));
+                }
             }
         }
         
         return filteredWords;
     }
     
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+    /**
+     *
+     * @param arr
+     * @param word
+     * @return
+     */
+    public boolean containsWord(ArrayList<String[]> arr, String[] word) {
+        // true if the ArrayList contains the wordlist already
+        boolean containsWord = false;
+        int idx = 0;
+        
+        while (idx < arr.size() && !containsWord) {
+            if (isSame(arr.get(idx), word)) {
+                containsWord = true;
+            }
+            idx++;
+        }
+        
+        return containsWord;
+    }
+    
+    /**
+     *
+     * @param str1
+     * @param str2
+     * @return
+     */
+    public boolean isSame(String[] str1, String[] str2) {
+        return (str1[0].compareTo(str2[0]) == 0 && str1[1].compareTo(str2[1]) == 0);
+    }
+    
+    /**
+     *
+     * @param sentenceWithPOSTag
+     * @param sentenceComparison
+     * @return
+     */
+    public SimilarityOutput getFirstSimilarity (ArrayList<String[]> sentenceWithPOSTag, ArrayList<String[]> sentenceComparison) {
+        // POS Tag comparison
+        SimilarityOutput similarity = new SimilarityOutput();
+        int i = 0, j = 0; //index
+        int countSame = 0;
+        int defaultComparatorSize = sentenceComparison.size();
+        
+        while (i < sentenceWithPOSTag.size()) {
+            boolean resetCycle = false;
+            while (j < sentenceComparison.size() && !resetCycle) {
+                if (isSame(sentenceWithPOSTag.get(i), sentenceComparison.get(j))) {
+                    sentenceWithPOSTag.remove(i);
+                    sentenceComparison.remove(j);
+                    i--;
+                    j--;
+                    resetCycle = true;
+                    countSame++;
+                }
+                j++;
+            }
+            i++;
+        }
+        
+        similarity.filteredSentenceWithPOSTag = new ArrayList<>(sentenceWithPOSTag);
+        similarity.sentenceComparison = new ArrayList<>(sentenceComparison);
+        similarity.similarityPercentage += ((double) countSame / (double) defaultComparatorSize);
+        similarity.baseSentenceSize = defaultComparatorSize;
+        
+        return similarity;
+    }
+    
+    /**
+     *
+     * @param similarityOutput
+     * @return
+     * @throws SQLException
+     */
+    public SimilarityOutput getSecondSimilarity (SimilarityOutput similarityOutput) throws SQLException {
+        // POS Tag comparison
+        SimilarityOutput similarity = new SimilarityOutput(similarityOutput);
+        ArrayList<String[]> sentenceComparison = similarityOutput.sentenceComparison, 
+                            sentenceWithPOSTag = similarityOutput.filteredSentenceWithPOSTag,
+                            synonyms;
+        DBManager dbm = new DBManager();
+        
+        int i = 0, j = 0, k; //index
+        int countSame = 0;
+        int defaultComparatorSize = similarityOutput.baseSentenceSize;
+        
+        while (i < sentenceWithPOSTag.size()) {
+            boolean resetCycle = false;
+            while (j < sentenceComparison.size() && !resetCycle) {
+                // Get synonyms from word and pos
+                k = 0;
+                synonyms = dbm.getSynonyms(sentenceComparison.get(j)[0], sentenceComparison.get(j)[1]);
+                while (k < synonyms.size() && !resetCycle) {
+                    // Compare i with k, because i and j were compared already
+                    if (isSame(sentenceWithPOSTag.get(i), synonyms.get(k))) {
+                        sentenceWithPOSTag.remove(i);
+                        sentenceComparison.remove(j);
+                        i--;
+                        j--;
+                        resetCycle = true;
+                        countSame++;
+                    }
+                    k++;
+                }
+                j++;
+            }
+            i++;
+        }
+        
+        similarity.filteredSentenceWithPOSTag = new ArrayList<>(sentenceWithPOSTag);
+        similarity.sentenceComparison = new ArrayList<>(sentenceComparison);
+        similarity.similarityPercentage += ((double)countSame / (double)defaultComparatorSize);
+        
+        return similarity;
+    }
+    
+    /**
+     *
+     * @param similarityOutput
+     * @return
+     */
+    public SimilarityOutput getThirdSimilarity (SimilarityOutput similarityOutput) {
+        // Jaro Winkler
+        SimilarityOutput similarity = new SimilarityOutput(similarityOutput);
+        ArrayList<String[]> sentenceComparison = similarityOutput.sentenceComparison, 
+                            sentenceWithPOSTag = similarityOutput.filteredSentenceWithPOSTag;
+        JaroWinkler jaroWinkler = new JaroWinkler();
+        int defaultComparatorSize = similarityOutput.baseSentenceSize;
+        
+        String concatSentence = "", concatSentenceComparison = "";
+        for (int i = 0; i < sentenceWithPOSTag.size(); i++) {
+            concatSentence += " " + sentenceWithPOSTag.get(i)[0];
+        }
+        for (int i = 0; i < sentenceComparison.size(); i++) {
+            concatSentenceComparison += " " + sentenceComparison.get(i)[0];
+        }
+        
+        similarity.similarityPercentage += (jaroWinkler.apply(concatSentence, concatSentenceComparison) / (double)defaultComparatorSize);
+        
+        return similarity;
+    }
+    
+    /**
+     *
+     * @param base
+     * @param compare
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     * @throws SQLException
+     */
+    public void processWords(String base, String compare) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, SQLException {
+        SimilarityOutput sim1, sim2, sim3;
+        ArrayList<String[]> sentenceBase = generatePOSTag(base),
+                            sentenceCompare = generatePOSTag(compare);
+        sim1 = getFirstSimilarity(sentenceBase, sentenceCompare);
+        sim2 = getSecondSimilarity(sim1);
+        sim3 = getThirdSimilarity(sim2);
+        System.out.println(sim3.similarityPercentage);
+    }
+    
+    /**
+     *
+     * @param args
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     * @throws SQLException
+     */
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, SQLException {
         StringProcessor sp = new StringProcessor();
         String s = "Saya senang bermain bola dan kotak";
-        ArrayList<String[]> s2 = sp.generatePOSTag(s);
-        ArrayList<String[]> s3 = sp.removeUnimportantWords(s2);
-        for(String[] x : s3) {
-            System.out.println(x[0] + " " + x[1]);
-        }
+        String t = "Saya senang bermain bola dan kotak dan segitiga";
+        
+        sp.processWords(s, t);
+//        ArrayList<String[]> s2 = sp.generatePOSTag(s);
+//        ArrayList<String[]> s3 = sp.removeUnimportantWords(s2);
+//        ArrayList<String[]> t2 = sp.generatePOSTag(t);
+//        ArrayList<String[]> t3 = sp.removeUnimportantWords(t2);
+//        System.out.println(sp.getFirstSimilarity(s3, t3).similarityPercentage);
+
+//          JaroWinkler j = new JaroWinkler();
+//          String s = "ini kebodohan adalah";
+//          String s2 = "ini adalah kebodohan";
+//          System.out.println(j.apply(s,s2));
     }
 }

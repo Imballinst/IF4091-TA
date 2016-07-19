@@ -33,7 +33,7 @@ Gunakan method getResponseSummary dari DBManager.
 Input: [String] sentence
 Output: [ArrayList<String[]>] sentenceWithPOSTag
 
-Gunakan kelas generatePOSTag dari StringProcessor.
+Gunakan method generatePOSTag dari StringProcessor.
 
 --> Menghilangkan kata-kata hubung yang tidak perlu
 
@@ -60,7 +60,8 @@ POS tag yang perlu dibuang:
 Input: [ArrayList<String[]>] sentenceWithPOSTag
 Output: [ArrayList<String[]>] filteredSentenceWithPOSTag
 
-Not implemented yet.
+Gunakan method removeUnimportantWords dari StringProcessor. Method ini juga akan melakukan filter terhadap kata-kata dengan
+POS Tag yang berduplikat.
 
 --> Dari seluruh kata dan POS tag dari kalimat pertama, iriskan dengan kalimat kedua
 
@@ -69,7 +70,7 @@ Not implemented yet.
 Input: [ArrayList<String[]>] filteredSentenceWithPOSTag
 Output: [SimilarityOutput] similarityOutput
 
-Not implemented yet.
+Gunakan method getFirstSimilarity dari StringProcessor.
 
 --> Cari sinonim dari tesaurus untuk sisa kata-kata yang berbeda
 
@@ -84,24 +85,24 @@ Not implemented yet.
 
 * Ternyata tidak ada kalimat yang saling bersinonim, maka lanjut ke tahap berikutnya
 
-Input: [ArrayList<String[]>] filteredSentenceWithPOSTag
+Input: [ArrayList<String[]>] uniqueFilteredSentenceWithPOSTag
 Output: [SimilarityOutput] similarityOutput
 
-Gunakan kelas DBManager dan eksekusi method getSynonyms.
+Gunakan method getSecondSimilarity dari StringProcessor.
 
 --> Aplikasikan algoritma Jaro Winkler apabila masih tersisa kata yang tidak bersinonim dari tesaurus
 
 * Setengah/NN populasi/NN
 * Dua/CDP puluh/CDP lima/CDP ribu/CDP orang/NN dewasa/JJ
 
-Input: [ArrayList<String[]>] filteredSentenceWithPOSTag
+Input: [ArrayList<String[]>] uniqueFilteredSentenceWithPOSTag
 Output: [SimilarityOutput] similarityOutput
 
 Not implemented yet.
 
---> Kalkulasikan nilai total kesamaan, yaitu 5/7 + 0 + Jaro Winkler
+--> Output similarityPercentage
 
-Input: [float] similarityOutput[0] + [float] similarityOutput[1] + [float] similarityOutput[2]
-Output: [float] totalSimilarity
+Input: [SimilarityOutput] similarityOutput
+Output: [float] similarityPercentage
 
 Not implemented yet.

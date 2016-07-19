@@ -22,6 +22,45 @@ import java.util.ArrayList;
  * @author Try
  */
 public class SimilarityOutput {
-    public float similarityPercentage = 0f;
-    public ArrayList<String[]> filteredSentenceWithPOSTag = new ArrayList<>();
+
+    /**
+     *
+     */
+    public Double similarityPercentage;
+
+    /**
+     *
+     */
+    public int baseSentenceSize;
+
+    /**
+     *
+     */
+    public ArrayList<String[]> filteredSentenceWithPOSTag;
+
+    /**
+     *
+     */
+    public ArrayList<String[]> sentenceComparison;
+    
+    /**
+     *
+     */
+    public SimilarityOutput() {
+        similarityPercentage = 0d;
+        baseSentenceSize = 0;
+        filteredSentenceWithPOSTag = new ArrayList<>();
+        sentenceComparison = new ArrayList<>();
+    }
+    
+    /**
+     *
+     * @param s
+     */
+    public SimilarityOutput(SimilarityOutput s) {
+        this.similarityPercentage = s.similarityPercentage;
+        this.baseSentenceSize = s.baseSentenceSize;
+        this.filteredSentenceWithPOSTag = s.filteredSentenceWithPOSTag;
+        this.sentenceComparison = s.sentenceComparison;
+    }
 }

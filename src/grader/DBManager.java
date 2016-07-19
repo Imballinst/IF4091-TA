@@ -20,7 +20,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
@@ -28,19 +27,28 @@ import java.util.ArrayList;
  *
  * @author Try
  */
-public class DBManager {
+public final class DBManager {
     String userName = "root";
     String password = "";
     String dbms = "mysql";
     String serverName = "localhost";
-    String dbName = "moodle";
+    String dbName = "testmdl";
     int portNumber = 3306;
     Connection conn = null;
     
+    /**
+     *
+     * @throws SQLException
+     */
     public DBManager() throws SQLException {
         conn = getConnection();
     }
     
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public Connection getConnection() throws SQLException {
         Properties connectionProps = new Properties();
         connectionProps.put("user", this.userName);
@@ -50,7 +58,7 @@ public class DBManager {
             conn = DriverManager.getConnection(
                        "jdbc:" + this.dbms + "://" +
                        this.serverName +
-                       ":" + this.portNumber + "/",
+                       ":" + this.portNumber + "/" + this.dbName,
                        connectionProps);
         } else if (this.dbms.equals("derby")) {
             conn = DriverManager.getConnection(
@@ -59,15 +67,19 @@ public class DBManager {
                        ";create=true",
                        connectionProps);
         }
-        System.out.println("Connected to database");
         return conn;
     }
     
+    /**
+     *
+     * @param questionID
+     * @return
+     * @throws SQLException
+     */
     public String getExpectedAnswer(int questionID) throws SQLException {
         PreparedStatement queryStatement = null;
         String stringStatement = "SELECT expectedanswer FROM mdl_qtype_essayinagrader_options WHERE questionid = ?";
         
-        Statement stmt = null;
         ResultSet rs = null;
         String expectedAnswer = "";
 
@@ -82,10 +94,7 @@ public class DBManager {
             }
         }
         catch (SQLException ex){
-            // handle any errors
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
+            
         }
         finally {
             if (rs != null) {
@@ -94,22 +103,28 @@ public class DBManager {
                 } catch (SQLException sqlEx) { } // ignore
                 rs = null;
             }
-            if (stmt != null) {
+            if (queryStatement != null) {
                 try {
-                    stmt.close();
+                    queryStatement.close();
                 } catch (SQLException sqlEx) { } // ignore
-                stmt = null;
+                queryStatement = null;
             }
         }
         
         return expectedAnswer;
     }
     
+    /**
+     *
+     * @param questionID
+     * @param questionUsageID
+     * @return
+     * @throws SQLException
+     */
     public String getResponseSummary(int questionID, int questionUsageID) throws SQLException {
         PreparedStatement queryStatement = null;
         String stringStatement = "SELECT responsesummary FROM mdl_question_attempts WHERE questionid = ? AND questionusageid = ?";
         
-        Statement stmt = null;
         ResultSet rs = null;
         String responseSummary = "";
 
@@ -125,10 +140,7 @@ public class DBManager {
             }
         }
         catch (SQLException ex){
-            // handle any errors
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
+            
         }
         finally {
             if (rs != null) {
@@ -137,42 +149,60 @@ public class DBManager {
                 } catch (SQLException sqlEx) { } // ignore
                 rs = null;
             }
-            if (stmt != null) {
+            if (queryStatement != null) {
                 try {
-                    stmt.close();
+                    queryStatement.close();
                 } catch (SQLException sqlEx) { } // ignore
-                stmt = null;
+                queryStatement = null;
             }
         }
         
         return responseSummary;
     }
     
-    public ArrayList<String> getSynonyms(String word, char pos) {
+    /**
+     *
+     * @param word
+     * @param pos
+     * @return
+     */
+    public ArrayList<String[]> getSynonyms(String word, String pos) {
         PreparedStatement queryStatement = null;
-        String wordIDStatement = "SELECT wordid FROM mdl_qtype_essayinagrader_options WHERE word = ?";
-        String stringStatement = "SELECT word FROM mdl_qtype_essayinagrader_options WHERE word = ?";
+        String wordStatement = "SELECT wordid FROM mdl_qtype_essayinagrader_synonyms WHERE word = ? AND pos = ?";
+        String wordIDStatement = "SELECT word,pos FROM mdl_qtype_essayinagrader_synonyms WHERE wordid = ? AND word != ?";
         
-        Statement stmt = null;
         ResultSet rs = null;
-        String wordPos = word.concat("-" + pos);
-        ArrayList<String> synonyms = new ArrayList<>();
-
+        int wordID = 0;
+        ArrayList<String[]> synonyms = new ArrayList<>();
+        
         try {
-            queryStatement = conn.prepareStatement(stringStatement);
-            queryStatement.setString(1, wordPos);
+            // Get wordid from the word
+            queryStatement = conn.prepareStatement(wordStatement);
+            queryStatement.setString(1, word);
+            queryStatement.setString(2, pos);
             
             rs = queryStatement.executeQuery();
             
             while (rs.next()) {
-                synonyms.add(rs.getString("word"));
+                wordID = rs.getInt("wordid");
+            }
+        
+            // Get words from the wordid
+            queryStatement = conn.prepareStatement(wordIDStatement);
+            queryStatement.setInt(1, wordID);
+            queryStatement.setString(2, word);
+            
+            rs = queryStatement.executeQuery();
+            
+            while (rs.next()) {
+                String[] s = new String[2];
+                s[0] = rs.getString("word");
+                s[1] = rs.getString("pos");
+                synonyms.add(s);
             }
         }
         catch (SQLException ex){
-            // handle any errors
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
+            
         }
         finally {
             if (rs != null) {
@@ -181,14 +211,27 @@ public class DBManager {
                 } catch (SQLException sqlEx) { } // ignore
                 rs = null;
             }
-            if (stmt != null) {
+            if (queryStatement != null) {
                 try {
-                    stmt.close();
+                    queryStatement.close();
                 } catch (SQLException sqlEx) { } // ignore
-                stmt = null;
+                queryStatement = null;
             }
         }
         
         return synonyms;
+    }
+    
+    /**
+     *
+     * @param args
+     * @throws SQLException
+     */
+    public static void main(String[] args) throws SQLException {
+        DBManager dbm = new DBManager();
+        ArrayList<String[]> str = dbm.getSynonyms("berdaya", "a");
+        for(String[] s : str) {
+            System.out.println(s[0] + " " + s[1]);
+        }
     }
 }
