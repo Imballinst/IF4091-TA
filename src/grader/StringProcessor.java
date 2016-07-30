@@ -15,10 +15,15 @@
  */
 package grader;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import IndonesianNLP.IndonesianNETagger;
+import IndonesianNLP.IndonesianPOSTagger;
+import IndonesianNLP.IndonesianPhraseChunker;
+import IndonesianNLP.IndonesianSentenceFormalization;
+import IndonesianNLP.IndonesianStemmer;
+import IndonesianNLP.IndonesianSentenceDetector;
 
 /**
  *
@@ -28,23 +33,26 @@ public class StringProcessor {
 
     /**
      *
+     * @param word
+     * @return
+     */
+    public String processStem(String word) {
+        IndonesianStemmer stemmer = new IndonesianStemmer();
+        String str = stemmer.stemSentence(word);
+
+        return str;
+    //        for(String s : str2) {    
+    //          System.out.println(s);
+    //        }
+    }
+    
+    /**
+     *
      * @param sentence
      * @return
-     * @throws ClassNotFoundException
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
      */
-    public ArrayList<String[]> generatePOSTag(String sentence) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-        // Reflection
-        Class fooClass = Class.forName("IndonesianPOSTagger");
-        Method fooMethod =
-            fooClass.getMethod("doPOSTag", new Class[] { String.class });
-
-        ArrayList<String[]> str =
-            (ArrayList<String[]>) fooMethod.invoke(fooClass.newInstance(), sentence);
+    public ArrayList<String[]> processPOSTag(String sentence) {
+        ArrayList<String[]> str = IndonesianPOSTagger.doPOSTag(sentence);
         
         return str;
 //        for(int i=0; i<str.size(); i++)
@@ -55,26 +63,56 @@ public class StringProcessor {
      *
      * @param sentence
      * @return
-     * @throws ClassNotFoundException
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
      */
-    public ArrayList<String> splitSentences(String sentence) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-        // Reflection
-        Class fooClass = Class.forName("IndonesianSentenceDetector");
-        Method fooMethod =
-            fooClass.getMethod("splitSentence", new Class[] { String.class });
-
-        ArrayList<String> str =
-            (ArrayList<String>) fooMethod.invoke(fooClass.newInstance(), sentence);
+    public ArrayList<String[]> processChunkSentence(String sentence) {
+        IndonesianPhraseChunker chunker = new IndonesianPhraseChunker();
+        ArrayList<String[]> str = chunker.doPhraseChunker(sentence);
+        
+        return str;
+//        for(int i=0; i<str.size(); i++)
+//            System.out.println(str.get(i)[0]+"/"+str.get(i)[1]);
+    }
+    
+    /**
+     *
+     * @param sentence
+     * @return
+     */
+    public ArrayList<String[]> processNETagSentence(String sentence) {
+        IndonesianNETagger NETagger = new IndonesianNETagger();
+        ArrayList<String[]> str = NETagger.NETagLine(sentence);
+        
+        return str;
+//        for(int i=0; i<str.size(); i++)
+//            System.out.println(str.get(i)[0]+"/"+str.get(i)[1]);
+    }
+    
+    /**
+     *
+     * @param sentence
+     * @return
+     */
+    public ArrayList<String> processSplitSentence(String sentence) {
+        IndonesianSentenceDetector sentenceDetector = new IndonesianSentenceDetector();
+        ArrayList<String> str = sentenceDetector.splitSentence(sentence);
         
         return str;
 //        for(String s : str2) {    
 //          System.out.println(s);
 //        }
+    }
+    
+    /**
+     *
+     * @param sentence
+     * @return
+     */
+    public String processFormalizeSentence(String sentence) {
+        IndonesianSentenceFormalization formalizer = new IndonesianSentenceFormalization();
+        String str = formalizer.formalizeSentence(sentence);
+        formalizer.initStopword();
+        
+        return formalizer.deleteStopword(str);
     }
     
     /**
@@ -133,6 +171,12 @@ public class StringProcessor {
                 str1[1].toLowerCase().compareTo(str2[1].toLowerCase()) == 0);
     }
     
+    /**
+     *
+     * @param posTag1
+     * @param posTag2
+     * @return
+     */
     public boolean isPOSTagSame(String posTag1, String posTag2) {
         boolean isSame = true;
         int charIdx = 0;
@@ -148,6 +192,11 @@ public class StringProcessor {
         return isSame;
     }
     
+    /**
+     *
+     * @param s
+     * @return
+     */
     public int countWordsBySpaces(String s) {
         return s.split(" ").length;
     }
@@ -304,21 +353,15 @@ public class StringProcessor {
      *
      * @param base
      * @param compare
-     * @throws ClassNotFoundException
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
      * @throws SQLException
      */
-    public void processWords(String base, String compare) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, SQLException {
+    public void compareSentence(String base, String compare) throws SQLException {
         if (countWordsBySpaces(base) > 1 && countWordsBySpaces(compare) > 1) {
             // more than one
             SimilarityOutput sim1, sim2, sim3;
         
-            ArrayList<String[]> sentenceBase = removeUnimportantWords(generatePOSTag(base)),
-                                sentenceCompare = removeUnimportantWords(generatePOSTag(compare));
+            ArrayList<String[]> sentenceBase = removeUnimportantWords(processPOSTag(base)),
+                                sentenceCompare = removeUnimportantWords(processPOSTag(compare));
             sim1 = getFirstSimilarity(sentenceBase, sentenceCompare);
             sim2 = getSecondSimilarity(sim1);
             sim3 = getThirdSimilarity(sim2);
@@ -332,20 +375,14 @@ public class StringProcessor {
     /**
      *
      * @param args
-     * @throws ClassNotFoundException
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
      * @throws SQLException
      */
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, SQLException {
+    public static void main(String[] args) throws SQLException {
         StringProcessor sp = new StringProcessor();
         String s = "Aku makan jagung";
         String t = "Aku makan nasi";
         
-        sp.processWords(s, t);
+        sp.compareSentence(s, t);
 //        ArrayList<String[]> s2 = sp.generatePOSTag(s);
 //        ArrayList<String[]> s3 = sp.removeUnimportantWords(s2);
 //        ArrayList<String[]> t2 = sp.generatePOSTag(t);

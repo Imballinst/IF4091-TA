@@ -22,14 +22,30 @@ import java.util.ArrayList;
  * @author imballinst
  */
 public class NearestSynonym {
+
+    /**
+     *
+     */
     public ArrayList<String[]> nearestSynonymString;
+
+    /**
+     *
+     */
     public ArrayList<Double> nearestSynonymPercentage;
     
+    /**
+     *
+     */
     public NearestSynonym() {
         nearestSynonymPercentage = new ArrayList<>();
         nearestSynonymString = new ArrayList<>();
     }
     
+    /**
+     *
+     * @param nearestSynonymString_
+     * @param nearestSynonymPercentage_
+     */
     public NearestSynonym(ArrayList<String[]> nearestSynonymString_, 
                           ArrayList<Double> nearestSynonymPercentage_) {
         nearestSynonymString = nearestSynonymString_;

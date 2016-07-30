@@ -43,6 +43,9 @@ public class SimilarityOutput {
      */
     public ArrayList<String[]> userAnswer;
     
+    /**
+     *
+     */
     public NearestSynonym nearestSynonym;
     
     /**

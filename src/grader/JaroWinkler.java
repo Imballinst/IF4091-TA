@@ -37,6 +37,10 @@
 
 package grader;
 
+/**
+ *
+ * @author Try
+ */
 public class JaroWinkler {    
     /**
      * The default prefix length limit set to four.
