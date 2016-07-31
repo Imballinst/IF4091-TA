@@ -28,16 +28,23 @@ import IndonesianNLP.IndonesianSentenceDetector;
  * @author Try
  */
 public class StringProcessor {
-
+    
     /**
      *
      * @param word
      * @return
      */
-    public String processStem(String word) {
+    public ArrayList<String[]> processStem(ArrayList<String[]> word) {
         IndonesianStemmer stemmer = new IndonesianStemmer();
-        String str = stemmer.stemSentence(word);
-
+        ArrayList<String[]> str = new ArrayList();
+        
+        for(String[] eachWord : word) {
+            String stemmedWord[] = new String[2];
+            stemmedWord[0] = stemmer.stem(eachWord[0]);
+            stemmedWord[1] = eachWord[1];
+            str.add(stemmedWord);
+        }
+        
         return str;
     }
     
@@ -129,7 +136,7 @@ public class StringProcessor {
      */
     public boolean isSame(String[] str1, String[] str2) {
         return (str1[0].toLowerCase().compareTo(str2[0].toLowerCase()) == 0 && 
-                str1[1].toLowerCase().compareTo(str2[1].toLowerCase()) == 0);
+                isPOSTagSame(str1[1], str2[1]));
     }
     
     /**
@@ -169,11 +176,13 @@ public class StringProcessor {
      * @return
      */
     public SimilarityOutput getFirstSimilarity (String _realAnswer, String _userAnswer) {
-        // Preprocess
         ArrayList<String[]> realAnswer = processPOSTag(_realAnswer),
                             userAnswer = processPOSTag(_userAnswer);
         
-        // Chunk tag comparison
+        realAnswer = removeUnimportantWords(realAnswer);
+        userAnswer = removeUnimportantWords(userAnswer);
+        
+        // POS tag comparison
         SimilarityOutput similarity = new SimilarityOutput();
         int i = 0, j; //index
         int countSame = 0;
@@ -371,25 +380,36 @@ public class StringProcessor {
      * @throws SQLException
      */
     public void compareSentence(String realAnswer, String userAnswer) throws SQLException {
-        if (countWordsBySpaces(realAnswer) > 1 && countWordsBySpaces(userAnswer) > 1) {
-            // more than one
-            SimilarityOutput sim1, sim2, sim3;
-            
-            String synthesizedRealAnswer = processFormalizeSentence(realAnswer);
-            String synthesizedUserAnswer = processFormalizeSentence(userAnswer);
-            
-            // POS tagging
-            sim1 = getFirstSimilarity(synthesizedRealAnswer, synthesizedUserAnswer);
-            // Synonym
-            sim2 = getSecondSimilarity(sim1);
-            // Jaro Winkler
-            sim3 = getThirdSimilarity(sim2);
-            System.out.println(sim3.getSimilarityPercentage());
+        if (processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).size() == 1) {
+            // single sentence
+            if (countWordsBySpaces(realAnswer) > 1 && countWordsBySpaces(userAnswer) > 1) {
+                // more than one
+                SimilarityOutput sim1, sim2, sim3;
+
+                String synthesizedRealAnswer = processFormalizeSentence(realAnswer);
+                String synthesizedUserAnswer = processFormalizeSentence(userAnswer);
+
+                // POS tagging
+                sim1 = getFirstSimilarity(synthesizedRealAnswer, synthesizedUserAnswer);
+                // Synonym
+                sim2 = getSecondSimilarity(sim1);
+                // Jaro Winkler
+                sim3 = getThirdSimilarity(sim2);
+                System.out.println(sim3.getSimilarityPercentage());
+            } else {
+                JaroWinkler jw = new JaroWinkler();
+                System.out.println(jw.apply(realAnswer, userAnswer));
+            }
         } else {
-            JaroWinkler jw = new JaroWinkler();
-            System.out.println(jw.apply(realAnswer, userAnswer));
+            // multiple sentences
         }
         System.out.println("*** END OF GRADING PROCESS ***");
+    }
+    
+    public double handleMultipleSentences(String _realAnswer, String _userAnswer) {
+        double similarity = 0d;
+        
+        return similarity;
     }
     
     /**
