@@ -203,16 +203,20 @@ public class StringProcessor {
     
     /**
      *
-     * @param realAnswer
-     * @param userAnswer
+     * @param _realAnswer
+     * @param _userAnswer
      * @return
      */
-    public SimilarityOutput getFirstSimilarity (ArrayList<String[]> realAnswer, ArrayList<String[]> userAnswer) {
-        // POS Tag comparison
-        SimilarityOutput similarity = new SimilarityOutput();
+    public ChunkerSimilarityOutput getFirstSimilarity (String _realAnswer, String _userAnswer) {
+        // Preprocess
+        ArrayList<String[]> realAnswer = processChunkSentence(_realAnswer),
+                            userAnswer = processChunkSentence(_userAnswer);
+        
+        // Chunk tag comparison
+        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput();
         int i = 0, j; //index
         int countSame = 0;
-        int defaultComparatorSize = userAnswer.size();
+        int defaultComparatorSize = realAnswer.size();
         
         while (i < realAnswer.size()) {
             boolean resetCycle = false;
@@ -231,35 +235,101 @@ public class StringProcessor {
             i++;
         }
         
-        similarity.realAnswer = new ArrayList<>(realAnswer);
-        similarity.userAnswer = new ArrayList<>(userAnswer);
-        similarity.similarityPercentage += ((double) countSame / (double) defaultComparatorSize);
-        similarity.baseSentenceSize = defaultComparatorSize;
+        chunkerSimilarity.setRealAnswer(realAnswer);
+        chunkerSimilarity.setUserAnswer(userAnswer);
+        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
+        chunkerSimilarity.setBaseChunkerSize(defaultComparatorSize);
         
-        return similarity;
+        return chunkerSimilarity;
     }
     
     /**
      *
-     * @param similarityOutput
+     * @param chunkerSimilarityOutput
+     * @return
+     */
+    public ChunkerSimilarityOutput getSecondSimilarity (ChunkerSimilarityOutput chunkerSimilarityOutput) {
+        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput(chunkerSimilarityOutput);
+        ArrayList<String[]> userAnswer = chunkerSimilarityOutput.getUserAnswer(), 
+                            realAnswer = chunkerSimilarityOutput.getRealAnswer();
+        String baseRealAnswer = "", baseUserAnswer = "";
+        
+        // Alter the ArrayList of String[] to a String, so then it can be POS tagged
+        for (int i = 0; i < realAnswer.size(); i++) {
+            baseRealAnswer += realAnswer.get(i)[0];
+            if (i + 1 == realAnswer.size()) {
+                // Remove whitespace at the end
+                baseRealAnswer = baseRealAnswer.substring(0, baseRealAnswer.length()-1);
+            }
+        }
+        for (int j = 0; j < userAnswer.size(); j++) {
+            baseUserAnswer += userAnswer.get(j)[0];
+            if (j + 1 == userAnswer.size()) {
+                // Remove whitespace at the end
+                baseUserAnswer = baseUserAnswer.substring(0, baseUserAnswer.length()-1);
+            }
+        }
+        
+        // Replace chunkerSimilarityOutput from Chunk tag to POS tag
+        chunkerSimilarityOutput.setUserAnswer(processPOSTag(baseUserAnswer));
+        chunkerSimilarityOutput.setRealAnswer(processPOSTag(baseRealAnswer));
+        chunkerSimilarityOutput.setBaseChunkerSize(processPOSTag(baseUserAnswer).size());
+        
+        // Redefine
+        userAnswer = chunkerSimilarityOutput.getUserAnswer();
+        realAnswer = chunkerSimilarityOutput.getRealAnswer();
+        
+        // POS tag comparison
+        int i = 0, j; //index
+        int countSame = 0;
+        int defaultComparatorSize = realAnswer.size();
+        
+        while (i < realAnswer.size()) {
+            boolean resetCycle = false;
+            j = 0;
+            while (j < userAnswer.size() && !resetCycle) {
+                if (isSame(realAnswer.get(i), userAnswer.get(j))) {
+                    realAnswer.remove(i);
+                    userAnswer.remove(j);
+                    i--;
+                    j--;
+                    resetCycle = true;
+                    countSame++;
+                }
+                j++;
+            }
+            i++;
+        }
+        
+        chunkerSimilarity.setRealAnswer(realAnswer);
+        chunkerSimilarity.setUserAnswer(userAnswer);
+        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
+        chunkerSimilarity.setBaseChunkerSize(defaultComparatorSize);
+        
+        return chunkerSimilarity;
+    }
+    
+    /**
+     *
+     * @param chunkerSimilarityOutput
      * @return
      * @throws SQLException
      */
-    public SimilarityOutput getSecondSimilarity (SimilarityOutput similarityOutput) throws SQLException {
+    public ChunkerSimilarityOutput getThirdSimilarity (ChunkerSimilarityOutput chunkerSimilarityOutput) throws SQLException {
         // POS Tag comparison
-        SimilarityOutput similarity = new SimilarityOutput(similarityOutput);
-        ArrayList<String[]> userAnswer = similarityOutput.userAnswer, 
-                            realAnswer = similarityOutput.realAnswer,
+        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput(chunkerSimilarityOutput);
+        ArrayList<String[]> userAnswer = chunkerSimilarityOutput.getUserAnswer(), 
+                            realAnswer = chunkerSimilarityOutput.getRealAnswer(),
                             synonyms;
         String[] nearestString;
-        double nearestStringValue;
+        Double nearestStringValue;
         DBManager dbm = new DBManager();
         NearestSynonym ns = new NearestSynonym();
         JaroWinkler jw = new JaroWinkler();
         
         int i = 0, j, k; //index
         int countSame = 0;
-        int defaultComparatorSize = similarityOutput.baseSentenceSize;
+        int defaultComparatorSize = chunkerSimilarityOutput.getBaseChunkerSize();
         
         while (i < realAnswer.size()) {
             boolean resetCycle = false;
@@ -280,7 +350,7 @@ public class StringProcessor {
                         resetCycle = true;
                         countSame++;
                     } else {
-                        double temp = jw.apply(realAnswer.get(i)[0], 
+                        Double temp = jw.apply(realAnswer.get(i)[0], 
                                                synonyms.get(k)[0]);
                         
                         if (temp > nearestStringValue) {
@@ -294,59 +364,65 @@ public class StringProcessor {
                 
                 // Check if there is a same word
                 if (!resetCycle) {
-                    ns.nearestSynonymString.add(nearestString);
-                    ns.nearestSynonymPercentage.add(nearestStringValue);
+                    ns.addNearestSynonymString(nearestString);
+                    ns.addNearestSynonymPercentage(nearestStringValue);
                 }
                 j++;
             }
             i++;
         }
         
-        similarity.realAnswer = new ArrayList<>(realAnswer);
-        similarity.userAnswer = new ArrayList<>(userAnswer);
-        similarity.similarityPercentage += ((double)countSame / (double)defaultComparatorSize);
-        similarity.nearestSynonym = ns;
+        chunkerSimilarity.setRealAnswer(realAnswer);
+        chunkerSimilarity.setUserAnswer(userAnswer);
+        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
+        chunkerSimilarity.setNearestSynonym(ns);
         
-        return similarity;
+        return chunkerSimilarity;
     }
     
     /**
      *
-     * @param similarityOutput
+     * @param chunkerSimilarityOutput
      * @return
      */
-    public SimilarityOutput getThirdSimilarity (SimilarityOutput similarityOutput) {
-        for(int i = 0; i < similarityOutput.nearestSynonym.nearestSynonymString.size(); i++) {
-            System.out.println(similarityOutput.nearestSynonym.nearestSynonymString
-                    .get(i)[0] + " " + similarityOutput.nearestSynonym.nearestSynonymString
-                    .get(i)[1] + " " + similarityOutput.nearestSynonym.
-                    nearestSynonymPercentage.get(i));
+    public ChunkerSimilarityOutput getFourthSimilarity (ChunkerSimilarityOutput chunkerSimilarityOutput) {
+        for(int i = 0; i < chunkerSimilarityOutput.getNearestSynonym().getNearestSynonymString().size(); i++) {
+            System.out.println(chunkerSimilarityOutput.getNearestSynonym().getNearestSynonymString()
+                    .get(i)[0] + " " + chunkerSimilarityOutput.getNearestSynonym().getNearestSynonymString()
+                    .get(i)[1] + " " + chunkerSimilarityOutput.getNearestSynonym().
+                    getNearestSynonymPercentage().get(i));
         }
         
         // Jaro Winkler
-        SimilarityOutput similarity = new SimilarityOutput(similarityOutput);
-        ArrayList<String[]> userAnswer = similarityOutput.userAnswer, 
-                            realAnswer = similarityOutput.realAnswer;
+        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput(chunkerSimilarityOutput);
+        ArrayList<String[]> userAnswer = chunkerSimilarityOutput.getUserAnswer(), 
+                            realAnswer = chunkerSimilarityOutput.getRealAnswer();
         JaroWinkler jaroWinkler = new JaroWinkler();
-        int defaultComparatorSize = similarityOutput.baseSentenceSize;
+        int defaultComparatorSize = chunkerSimilarityOutput.getBaseChunkerSize();
         
         String concatSentence = "", concatSentenceComparison = "";
         for (int i = 0; i < realAnswer.size(); i++) {
             concatSentence += realAnswer.get(i)[0];
             if (i + 1 < realAnswer.size()) {
+                // Add whitespace
                 concatSentence += " ";
             }
         }
         for (int i = 0; i < userAnswer.size(); i++) {
             concatSentenceComparison += userAnswer.get(i)[0];
             if (i + 1 < userAnswer.size()) {
+                // Add whitespace
                 concatSentenceComparison += " ";
             }
         }
         
-        similarity.similarityPercentage += (jaroWinkler.apply(concatSentence, concatSentenceComparison) / (double)defaultComparatorSize);
+        System.out.println(concatSentence);
+        System.out.println(concatSentenceComparison);
+        System.out.println((jaroWinkler.apply(concatSentence, concatSentenceComparison)));
         
-        return similarity;
+        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + (jaroWinkler.apply(concatSentence, concatSentenceComparison) / (double)defaultComparatorSize));
+        
+        return chunkerSimilarity;
     }
     
     /**
@@ -358,14 +434,13 @@ public class StringProcessor {
     public void compareSentence(String base, String compare) throws SQLException {
         if (countWordsBySpaces(base) > 1 && countWordsBySpaces(compare) > 1) {
             // more than one
-            SimilarityOutput sim1, sim2, sim3;
+            ChunkerSimilarityOutput sim1, sim2, sim3, sim4;
         
-            ArrayList<String[]> sentenceBase = removeUnimportantWords(processPOSTag(base)),
-                                sentenceCompare = removeUnimportantWords(processPOSTag(compare));
-            sim1 = getFirstSimilarity(sentenceBase, sentenceCompare);
+            sim1 = getFirstSimilarity(base, compare);
             sim2 = getSecondSimilarity(sim1);
             sim3 = getThirdSimilarity(sim2);
-            System.out.println(sim3.similarityPercentage);
+            sim4 = getFourthSimilarity(sim3);
+            System.out.println(sim3.getSimilarityPercentage());
         } else {
             JaroWinkler jw = new JaroWinkler();
             System.out.println("JW: " + jw.apply(base, compare));
@@ -379,19 +454,9 @@ public class StringProcessor {
      */
     public static void main(String[] args) throws SQLException {
         StringProcessor sp = new StringProcessor();
-        String s = "Aku makan jagung";
-        String t = "Aku makan nasi";
+        String s = "Aku tidak pergi";
+        String t = "Aku pergi ke Institut Teknologi Bandung";
         
         sp.compareSentence(s, t);
-//        ArrayList<String[]> s2 = sp.generatePOSTag(s);
-//        ArrayList<String[]> s3 = sp.removeUnimportantWords(s2);
-//        ArrayList<String[]> t2 = sp.generatePOSTag(t);
-//        ArrayList<String[]> t3 = sp.removeUnimportantWords(t2);
-//        System.out.println(sp.getFirstSimilarity(s3, t3).similarityPercentage);
-
-//          JaroWinkler j = new JaroWinkler();
-//          String s = "ini kebodohan adalah";
-//          String s2 = "ini adalah kebodohan";
-//          System.out.println(j.apply(s,s2));
     }
 }

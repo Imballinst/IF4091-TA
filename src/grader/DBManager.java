@@ -28,13 +28,13 @@ import java.util.ArrayList;
  * @author Try
  */
 public final class DBManager {
-    String userName = "root";
-    String password = "";
-    String dbms = "mysql";
-    String serverName = "localhost";
-    String dbName = "testmdl";
-    int portNumber = 3306;
-    Connection conn = null;
+    private String userName = "root";
+    private String password = "";
+    private String dbms = "mysql";
+    private String serverName = "localhost";
+    private String dbName = "testmdl";
+    private int portNumber = 3306;
+    private Connection conn = null;
     
     /**
      *
@@ -49,7 +49,7 @@ public final class DBManager {
      * @return
      * @throws SQLException
      */
-    public Connection getConnection() throws SQLException {
+    private Connection getConnection() throws SQLException {
         Properties connectionProps = new Properties();
         connectionProps.put("user", this.userName);
         connectionProps.put("password", this.password);
@@ -228,11 +228,11 @@ public final class DBManager {
      * @param args
      * @throws SQLException
      */
-    public static void main(String[] args) throws SQLException {
-        DBManager dbm = new DBManager();
-        ArrayList<String[]> str = dbm.getSynonyms("berdaya", "a");
-        for(String[] s : str) {
-            System.out.println(s[0] + " " + s[1]);
-        }
-    }
+//    public static void main(String[] args) throws SQLException {
+//        DBManager dbm = new DBManager();
+//        ArrayList<String[]> str = dbm.getSynonyms("berdaya", "a");
+//        for(String[] s : str) {
+//            System.out.println(s[0] + " " + s[1]);
+//        }
+//    }
 }

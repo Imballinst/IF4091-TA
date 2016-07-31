@@ -26,19 +26,19 @@ public class NearestSynonym {
     /**
      *
      */
-    public ArrayList<String[]> nearestSynonymString;
+    private ArrayList<String[]> nearestSynonymString;
 
     /**
      *
      */
-    public ArrayList<Double> nearestSynonymPercentage;
+    private ArrayList<Double> nearestSynonymPercentage;
     
     /**
      *
      */
     public NearestSynonym() {
-        nearestSynonymPercentage = new ArrayList<>();
-        nearestSynonymString = new ArrayList<>();
+        this.nearestSynonymPercentage = new ArrayList<>();
+        this.nearestSynonymString = new ArrayList<>();
     }
     
     /**
@@ -48,7 +48,39 @@ public class NearestSynonym {
      */
     public NearestSynonym(ArrayList<String[]> nearestSynonymString_, 
                           ArrayList<Double> nearestSynonymPercentage_) {
-        nearestSynonymString = nearestSynonymString_;
-        nearestSynonymPercentage = nearestSynonymPercentage_;
+        this.nearestSynonymString = nearestSynonymString_;
+        this.nearestSynonymPercentage = nearestSynonymPercentage_;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public ArrayList<String[]> getNearestSynonymString() {
+        return nearestSynonymString;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public ArrayList<Double> getNearestSynonymPercentage() {
+        return nearestSynonymPercentage;
+    }
+    
+    /**
+     *
+     * @param str
+     */
+    public void addNearestSynonymString(String[] str) {
+        nearestSynonymString.add(str);
+    }
+    
+    /**
+     *
+     * @param d
+     */
+    public void addNearestSynonymPercentage(Double d) {
+        nearestSynonymPercentage.add(d);
     }
 }
