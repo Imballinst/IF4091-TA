@@ -22,19 +22,11 @@ import java.util.ArrayList;
  * @author imballinst
  */
 public class NearestSynonym {
-
-    /**
-     *
-     */
     private ArrayList<String[]> nearestSynonymString;
-
-    /**
-     *
-     */
     private ArrayList<Double> nearestSynonymPercentage;
     
     /**
-     *
+     * Constructor
      */
     public NearestSynonym() {
         this.nearestSynonymPercentage = new ArrayList<>();

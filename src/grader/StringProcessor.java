@@ -18,9 +18,7 @@ package grader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import IndonesianNLP.IndonesianNETagger;
 import IndonesianNLP.IndonesianPOSTagger;
-import IndonesianNLP.IndonesianPhraseChunker;
 import IndonesianNLP.IndonesianSentenceFormalization;
 import IndonesianNLP.IndonesianStemmer;
 import IndonesianNLP.IndonesianSentenceDetector;
@@ -41,9 +39,6 @@ public class StringProcessor {
         String str = stemmer.stemSentence(word);
 
         return str;
-    //        for(String s : str2) {    
-    //          System.out.println(s);
-    //        }
     }
     
     /**
@@ -55,36 +50,6 @@ public class StringProcessor {
         ArrayList<String[]> str = IndonesianPOSTagger.doPOSTag(sentence);
         
         return str;
-//        for(int i=0; i<str.size(); i++)
-//            System.out.println(str.get(i)[0]+"/"+str.get(i)[1]);
-    }
-    
-    /**
-     *
-     * @param sentence
-     * @return
-     */
-    public ArrayList<String[]> processChunkSentence(String sentence) {
-        IndonesianPhraseChunker chunker = new IndonesianPhraseChunker();
-        ArrayList<String[]> str = chunker.doPhraseChunker(sentence);
-        
-        return str;
-//        for(int i=0; i<str.size(); i++)
-//            System.out.println(str.get(i)[0]+"/"+str.get(i)[1]);
-    }
-    
-    /**
-     *
-     * @param sentence
-     * @return
-     */
-    public ArrayList<String[]> processNETagSentence(String sentence) {
-        IndonesianNETagger NETagger = new IndonesianNETagger();
-        ArrayList<String[]> str = NETagger.NETagLine(sentence);
-        
-        return str;
-//        for(int i=0; i<str.size(); i++)
-//            System.out.println(str.get(i)[0]+"/"+str.get(i)[1]);
     }
     
     /**
@@ -97,9 +62,6 @@ public class StringProcessor {
         ArrayList<String> str = sentenceDetector.splitSentence(sentence);
         
         return str;
-//        for(String s : str2) {    
-//          System.out.println(s);
-//        }
     }
     
     /**
@@ -110,9 +72,8 @@ public class StringProcessor {
     public String processFormalizeSentence(String sentence) {
         IndonesianSentenceFormalization formalizer = new IndonesianSentenceFormalization();
         String str = formalizer.formalizeSentence(sentence);
-        formalizer.initStopword();
         
-        return formalizer.deleteStopword(str);
+        return str;
     }
     
     /**
@@ -207,13 +168,13 @@ public class StringProcessor {
      * @param _userAnswer
      * @return
      */
-    public ChunkerSimilarityOutput getFirstSimilarity (String _realAnswer, String _userAnswer) {
+    public SimilarityOutput getFirstSimilarity (String _realAnswer, String _userAnswer) {
         // Preprocess
-        ArrayList<String[]> realAnswer = processChunkSentence(_realAnswer),
-                            userAnswer = processChunkSentence(_userAnswer);
+        ArrayList<String[]> realAnswer = processPOSTag(_realAnswer),
+                            userAnswer = processPOSTag(_userAnswer);
         
         // Chunk tag comparison
-        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput();
+        SimilarityOutput similarity = new SimilarityOutput();
         int i = 0, j; //index
         int countSame = 0;
         int defaultComparatorSize = realAnswer.size();
@@ -235,91 +196,33 @@ public class StringProcessor {
             i++;
         }
         
-        chunkerSimilarity.setRealAnswer(realAnswer);
-        chunkerSimilarity.setUserAnswer(userAnswer);
-        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
-        chunkerSimilarity.setBaseChunkerSize(defaultComparatorSize);
+        if (userAnswer.size() > realAnswer.size()) {
+            similarity.setExcessivePOSWord(userAnswer.size() - realAnswer.size());
+        }
+        System.out.println(countSame);
+        System.out.println("Excessive: " + similarity.getExcessivePOSWord());
         
-        return chunkerSimilarity;
+        similarity.setRealAnswer(realAnswer);
+        similarity.setUserAnswer(userAnswer);
+        similarity.setBasePOSTagCountSame(countSame);
+        similarity.setBasePOSTagSize(defaultComparatorSize);
+        similarity.setSimilarityPercentage(similarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
+        
+        System.out.println("***");        
+        return similarity;
     }
     
     /**
      *
-     * @param chunkerSimilarityOutput
-     * @return
-     */
-    public ChunkerSimilarityOutput getSecondSimilarity (ChunkerSimilarityOutput chunkerSimilarityOutput) {
-        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput(chunkerSimilarityOutput);
-        ArrayList<String[]> userAnswer = chunkerSimilarityOutput.getUserAnswer(), 
-                            realAnswer = chunkerSimilarityOutput.getRealAnswer();
-        String baseRealAnswer = "", baseUserAnswer = "";
-        
-        // Alter the ArrayList of String[] to a String, so then it can be POS tagged
-        for (int i = 0; i < realAnswer.size(); i++) {
-            baseRealAnswer += realAnswer.get(i)[0];
-            if (i + 1 == realAnswer.size()) {
-                // Remove whitespace at the end
-                baseRealAnswer = baseRealAnswer.substring(0, baseRealAnswer.length()-1);
-            }
-        }
-        for (int j = 0; j < userAnswer.size(); j++) {
-            baseUserAnswer += userAnswer.get(j)[0];
-            if (j + 1 == userAnswer.size()) {
-                // Remove whitespace at the end
-                baseUserAnswer = baseUserAnswer.substring(0, baseUserAnswer.length()-1);
-            }
-        }
-        
-        // Replace chunkerSimilarityOutput from Chunk tag to POS tag
-        chunkerSimilarityOutput.setUserAnswer(processPOSTag(baseUserAnswer));
-        chunkerSimilarityOutput.setRealAnswer(processPOSTag(baseRealAnswer));
-        chunkerSimilarityOutput.setBaseChunkerSize(processPOSTag(baseUserAnswer).size());
-        
-        // Redefine
-        userAnswer = chunkerSimilarityOutput.getUserAnswer();
-        realAnswer = chunkerSimilarityOutput.getRealAnswer();
-        
-        // POS tag comparison
-        int i = 0, j; //index
-        int countSame = 0;
-        int defaultComparatorSize = realAnswer.size();
-        
-        while (i < realAnswer.size()) {
-            boolean resetCycle = false;
-            j = 0;
-            while (j < userAnswer.size() && !resetCycle) {
-                if (isSame(realAnswer.get(i), userAnswer.get(j))) {
-                    realAnswer.remove(i);
-                    userAnswer.remove(j);
-                    i--;
-                    j--;
-                    resetCycle = true;
-                    countSame++;
-                }
-                j++;
-            }
-            i++;
-        }
-        
-        chunkerSimilarity.setRealAnswer(realAnswer);
-        chunkerSimilarity.setUserAnswer(userAnswer);
-        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
-        chunkerSimilarity.setBaseChunkerSize(defaultComparatorSize);
-        
-        return chunkerSimilarity;
-    }
-    
-    /**
-     *
-     * @param chunkerSimilarityOutput
+     * @param similarityOutput
      * @return
      * @throws SQLException
      */
-    public ChunkerSimilarityOutput getThirdSimilarity (ChunkerSimilarityOutput chunkerSimilarityOutput) throws SQLException {
+    public SimilarityOutput getSecondSimilarity (SimilarityOutput similarityOutput) throws SQLException {
         // POS Tag comparison
-        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput(chunkerSimilarityOutput);
-        ArrayList<String[]> userAnswer = chunkerSimilarityOutput.getUserAnswer(), 
-                            realAnswer = chunkerSimilarityOutput.getRealAnswer(),
+        SimilarityOutput similarity = new SimilarityOutput(similarityOutput);
+        ArrayList<String[]> userAnswer = similarityOutput.getUserAnswer(), 
+                            realAnswer = similarityOutput.getRealAnswer(),
                             synonyms;
         String[] nearestString;
         Double nearestStringValue;
@@ -327,78 +230,89 @@ public class StringProcessor {
         NearestSynonym ns = new NearestSynonym();
         JaroWinkler jw = new JaroWinkler();
         
-        int i = 0, j, k; //index
-        int countSame = 0;
-        int defaultComparatorSize = chunkerSimilarityOutput.getBaseChunkerSize();
+        System.out.println(similarity.getBasePOSTagCountSame());
+        System.out.println("Excessive: " + similarity.getExcessivePOSWord());
         
-        while (i < realAnswer.size()) {
-            boolean resetCycle = false;
-            j = 0;
-            while (j < userAnswer.size() && !resetCycle) {
-                // Get synonyms from word and pos
-                k = 0;
-                nearestStringValue = 0d;
-                nearestString = new String[2];
-                synonyms = dbm.getSynonyms(userAnswer.get(j)[0], userAnswer.get(j)[1]);
-                while (k < synonyms.size() && !resetCycle) {
-                    // Compare i with k, because i and j were compared already
-                    if (isSame(realAnswer.get(i), synonyms.get(k))) {
-                        realAnswer.remove(i);
-                        userAnswer.remove(j);
-                        i--;
-                        j--;
-                        resetCycle = true;
-                        countSame++;
-                    } else {
-                        Double temp = jw.apply(realAnswer.get(i)[0], 
-                                               synonyms.get(k)[0]);
-                        
-                        if (temp > nearestStringValue) {
-                            nearestString[0] = realAnswer.get(i)[0];
-                            nearestString[1] = synonyms.get(k)[0];
-                            nearestStringValue = temp;
+        if (!userAnswer.isEmpty() && !realAnswer.isEmpty()) {
+            int i = 0, j, k; //index
+            int countSame = 0;
+            int defaultComparatorSize = similarityOutput.getBasePOSTagSize();
+            
+            while (i < realAnswer.size()) {
+                boolean resetCycle = false;
+                j = 0;
+                while (j < userAnswer.size() && !resetCycle) {
+                    // Get synonyms from word and pos
+                    k = 0;
+                    nearestStringValue = 0d;
+                    nearestString = new String[2];
+                    synonyms = dbm.getSynonyms(userAnswer.get(j)[0], userAnswer.get(j)[1]);
+                    System.out.println("Syns size of " + userAnswer.get(j)[0] + " " + userAnswer.get(j)[1] + ": " + synonyms.size());
+                    while (k < synonyms.size() && !resetCycle) {
+                        // Compare i with k, because i and j were compared already
+                        System.out.println(realAnswer.get(i)[0] + "-" + realAnswer.get(i)[1] + " " + synonyms.get(k)[0] + "-" + synonyms.get(k)[1]);
+                        if (isSame(realAnswer.get(i), synonyms.get(k))) {
+                            realAnswer.remove(i);
+                            userAnswer.remove(j);
+                            i--;
+                            j--;
+                            resetCycle = true;
+                            countSame++;
+                        } else {
+                            Double temp = jw.apply(realAnswer.get(i)[0], 
+                                                   synonyms.get(k)[0]);
+
+                            if (temp > nearestStringValue) {
+                                nearestString[0] = realAnswer.get(i)[0];
+                                nearestString[1] = synonyms.get(k)[0];
+                                nearestStringValue = temp;
+                            }
                         }
+                        k++;
                     }
-                    k++;
+
+                    // Check if there is a same word
+                    if (!resetCycle && !synonyms.isEmpty()) {
+                        ns.addNearestSynonymString(nearestString);
+                        ns.addNearestSynonymPercentage(nearestStringValue);
+                    }
+                    j++;
                 }
-                
-                // Check if there is a same word
-                if (!resetCycle) {
-                    ns.addNearestSynonymString(nearestString);
-                    ns.addNearestSynonymPercentage(nearestStringValue);
-                }
-                j++;
+                i++;
             }
-            i++;
+            
+            // POS tag constant
+            double posTagConstant = 1 - (similarityOutput.getBasePOSTagCountSame() / similarityOutput.getBasePOSTagSize());
+
+            similarity.setRealAnswer(realAnswer);
+            similarity.setUserAnswer(userAnswer);
+            similarity.setSimilarityPercentage(similarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize) * posTagConstant);
+            similarity.setNearestSynonym(ns);
         }
         
-        chunkerSimilarity.setRealAnswer(realAnswer);
-        chunkerSimilarity.setUserAnswer(userAnswer);
-        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
-        chunkerSimilarity.setNearestSynonym(ns);
-        
-        return chunkerSimilarity;
+        System.out.println("***");
+        return similarity;
     }
     
     /**
      *
-     * @param chunkerSimilarityOutput
+     * @param similarityOutput
      * @return
      */
-    public ChunkerSimilarityOutput getFourthSimilarity (ChunkerSimilarityOutput chunkerSimilarityOutput) {
-        for(int i = 0; i < chunkerSimilarityOutput.getNearestSynonym().getNearestSynonymString().size(); i++) {
-            System.out.println(chunkerSimilarityOutput.getNearestSynonym().getNearestSynonymString()
-                    .get(i)[0] + " " + chunkerSimilarityOutput.getNearestSynonym().getNearestSynonymString()
-                    .get(i)[1] + " " + chunkerSimilarityOutput.getNearestSynonym().
+    public SimilarityOutput getThirdSimilarity (SimilarityOutput similarityOutput) {
+        for(int i = 0; i < similarityOutput.getNearestSynonym().getNearestSynonymString().size(); i++) {
+            System.out.println("lel: " + similarityOutput.getNearestSynonym().getNearestSynonymString()
+                    .get(i)[0] + " " + similarityOutput.getNearestSynonym().getNearestSynonymString()
+                    .get(i)[1] + " " + similarityOutput.getNearestSynonym().
                     getNearestSynonymPercentage().get(i));
         }
         
         // Jaro Winkler
-        ChunkerSimilarityOutput chunkerSimilarity = new ChunkerSimilarityOutput(chunkerSimilarityOutput);
-        ArrayList<String[]> userAnswer = chunkerSimilarityOutput.getUserAnswer(), 
-                            realAnswer = chunkerSimilarityOutput.getRealAnswer();
+        SimilarityOutput similarity = new SimilarityOutput(similarityOutput);
+        ArrayList<String[]> userAnswer = similarityOutput.getUserAnswer(), 
+                            realAnswer = similarityOutput.getRealAnswer();
         JaroWinkler jaroWinkler = new JaroWinkler();
-        int defaultComparatorSize = chunkerSimilarityOutput.getBaseChunkerSize();
+        int defaultComparatorSize = similarityOutput.getBasePOSTagSize();
         
         String concatSentence = "", concatSentenceComparison = "";
         for (int i = 0; i < realAnswer.size(); i++) {
@@ -416,35 +330,66 @@ public class StringProcessor {
             }
         }
         
-        System.out.println(concatSentence);
-        System.out.println(concatSentenceComparison);
-        System.out.println((jaroWinkler.apply(concatSentence, concatSentenceComparison)));
+        // POS tag constant
+        double posTagConstant = 1 - (similarityOutput.getBasePOSTagCountSame() / similarityOutput.getBasePOSTagSize());
+        System.out.println("POStagCS: " + similarityOutput.getBasePOSTagCountSame());
+        System.out.println("POStagBS: " + similarityOutput.getBasePOSTagSize());
         
-        chunkerSimilarity.setSimilarityPercentage(chunkerSimilarity.getSimilarityPercentage() + (jaroWinkler.apply(concatSentence, concatSentenceComparison) / (double)defaultComparatorSize));
+        // Excessive
+        double excessivePenalty = 0d;
+        if (similarityOutput.getExcessivePOSWord() == 0) {
+            // if POS word excessive == 0 there might be 2nd and 3rd similarity was skipped
+            if (similarityOutput.getExcessivePOSWord() != 0) {
+                // penalty
+                excessivePenalty = (double) similarityOutput.getExcessivePOSWord() / 
+                        (double) (similarityOutput.getBasePOSTagSize() + similarityOutput.getExcessivePOSWord());
+                System.out.println("penaltya: " + excessivePenalty + " " + similarityOutput.getExcessivePOSWord());
+            }
+        } else {
+            // there is excessive word
+            excessivePenalty = (double) similarityOutput.getExcessivePOSWord()/ 
+                        (double) (similarityOutput.getBasePOSTagSize() + similarityOutput.getBasePOSTagSize());
+                System.out.println("penaltyb: " + excessivePenalty + " " + similarityOutput.getExcessivePOSWord());
+        }
         
-        return chunkerSimilarity;
+        // Jaro-Winkler
+        double jw = jaroWinkler.apply(concatSentence, concatSentenceComparison);
+        
+        // Calculate overall
+        double similarityOverall = similarity.getSimilarityPercentage() + (jw / (double)defaultComparatorSize * posTagConstant);
+        similarityOverall -= excessivePenalty;
+        
+        similarity.setSimilarityPercentage(similarityOverall);
+        
+        return similarity;
     }
     
     /**
      *
-     * @param base
-     * @param compare
+     * @param realAnswer
+     * @param userAnswer
      * @throws SQLException
      */
-    public void compareSentence(String base, String compare) throws SQLException {
-        if (countWordsBySpaces(base) > 1 && countWordsBySpaces(compare) > 1) {
+    public void compareSentence(String realAnswer, String userAnswer) throws SQLException {
+        if (countWordsBySpaces(realAnswer) > 1 && countWordsBySpaces(userAnswer) > 1) {
             // more than one
-            ChunkerSimilarityOutput sim1, sim2, sim3, sim4;
-        
-            sim1 = getFirstSimilarity(base, compare);
+            SimilarityOutput sim1, sim2, sim3;
+            
+            String synthesizedRealAnswer = processFormalizeSentence(realAnswer);
+            String synthesizedUserAnswer = processFormalizeSentence(userAnswer);
+            
+            // POS tagging
+            sim1 = getFirstSimilarity(synthesizedRealAnswer, synthesizedUserAnswer);
+            // Synonym
             sim2 = getSecondSimilarity(sim1);
+            // Jaro Winkler
             sim3 = getThirdSimilarity(sim2);
-            sim4 = getFourthSimilarity(sim3);
             System.out.println(sim3.getSimilarityPercentage());
         } else {
             JaroWinkler jw = new JaroWinkler();
-            System.out.println("JW: " + jw.apply(base, compare));
+            System.out.println(jw.apply(realAnswer, userAnswer));
         }
+        System.out.println("*** END OF GRADING PROCESS ***");
     }
     
     /**
@@ -454,8 +399,13 @@ public class StringProcessor {
      */
     public static void main(String[] args) throws SQLException {
         StringProcessor sp = new StringProcessor();
-        String s = "Aku tidak pergi";
-        String t = "Aku pergi ke Institut Teknologi Bandung";
+        String s = "Pada hakikatnya, seorang bayi yang baru lahir tergolong suci.";
+        String t = "Pada hakikatnya, seorang bayi yang baru lahir tergolong bersih.";
+        
+//        ArrayList<String[]> str = IndonesianPOSTagger.doPOSTag(t);
+//        for(String[] xs : str) {
+//            System.out.println(xs[0] + " " + xs[1]);
+//        }
         
         sp.compareSentence(s, t);
     }

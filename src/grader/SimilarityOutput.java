@@ -21,44 +21,23 @@ import java.util.ArrayList;
  *
  * @author Try
  */
-public class ChunkerSimilarityOutput {
-
-    /**
-     *
-     */
+public class SimilarityOutput {
     private Double similarityPercentage;
-
-    /**
-     *
-     */
-    private int baseChunkerSize;
-
-    /**
-     *
-     */
+    private int basePOSTagSize;
+    private int basePOSTagCountSame;
+    private int excessivePOSWord;
     private ArrayList<String[]> realAnswer;
-
-    /**
-     *
-     */
     private ArrayList<String[]> userAnswer;
-    
-    /**
-     *
-     */
     private NearestSynonym nearestSynonym;
     
     /**
-     *
+     * Constructor
      */
-    private int basePOSTagSize;
-    
-    /**
-     *
-     */
-    public ChunkerSimilarityOutput() {
+    public SimilarityOutput() {
         similarityPercentage = 0d;
-        baseChunkerSize = 0;
+        basePOSTagSize = 0;
+        basePOSTagCountSame = 0;
+        excessivePOSWord = 0;
         realAnswer = new ArrayList<>();
         userAnswer = new ArrayList<>();
         nearestSynonym = new NearestSynonym();
@@ -68,9 +47,11 @@ public class ChunkerSimilarityOutput {
      *
      * @param s
      */
-    public ChunkerSimilarityOutput(ChunkerSimilarityOutput s) {
+    public SimilarityOutput(SimilarityOutput s) {
         this.similarityPercentage = s.similarityPercentage;
-        this.baseChunkerSize = s.baseChunkerSize;
+        this.basePOSTagSize = s.basePOSTagSize;
+        this.basePOSTagCountSame = s.basePOSTagCountSame;
+        this.excessivePOSWord = s.excessivePOSWord;
         this.realAnswer = s.realAnswer;
         this.userAnswer = s.userAnswer;
         this.nearestSynonym = s.nearestSynonym;
@@ -88,20 +69,6 @@ public class ChunkerSimilarityOutput {
      */
     public void setSimilarityPercentage(Double similarityPercentage) {
         this.similarityPercentage = similarityPercentage;
-    }
-
-    /**
-     * @return the baseSentenceSize
-     */
-    public int getBaseChunkerSize() {
-        return baseChunkerSize;
-    }
-
-    /**
-     * @param baseChunkerSize the baseSentenceSize to set
-     */
-    public void setBaseChunkerSize(int baseChunkerSize) {
-        this.baseChunkerSize = baseChunkerSize;
     }
 
     /**
@@ -144,5 +111,47 @@ public class ChunkerSimilarityOutput {
      */
     public void setNearestSynonym(NearestSynonym nearestSynonym) {
         this.nearestSynonym = nearestSynonym;
+    }
+
+    /**
+     * @return the basePOSTagSize
+     */
+    public int getBasePOSTagSize() {
+        return basePOSTagSize;
+    }
+
+    /**
+     * @param basePOSTagSize the basePOSTagSize to set
+     */
+    public void setBasePOSTagSize(int basePOSTagSize) {
+        this.basePOSTagSize = basePOSTagSize;
+    }
+
+    /**
+     * @return the excessivePOSWord
+     */
+    public int getExcessivePOSWord() {
+        return excessivePOSWord;
+    }
+
+    /**
+     * @param excessivePOSWord the excessivePOSWord to set
+     */
+    public void setExcessivePOSWord(int excessivePOSWord) {
+        this.excessivePOSWord = excessivePOSWord;
+    }
+
+    /**
+     * @return the basePOSTagCountSame
+     */
+    public int getBasePOSTagCountSame() {
+        return basePOSTagCountSame;
+    }
+
+    /**
+     * @param basePOSTagCountSame the basePOSTagCountSame to set
+     */
+    public void setBasePOSTagCountSame(int basePOSTagCountSame) {
+        this.basePOSTagCountSame = basePOSTagCountSame;
     }
 }

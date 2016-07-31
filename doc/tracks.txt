@@ -1,0 +1,2 @@
+- IndonesianPOSTag dihilangkan System.out.println di dalam method doPOSTag
+-- Saat output di php, ignore result yang pertama. Result array adalah keluaran dari setiap kali System.out.println

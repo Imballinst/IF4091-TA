@@ -50,6 +50,7 @@ POS tag yang perlu disimpan:
 * DT [determiner]: kata pengenal dari kata benda, seperti <noun> ini/itu, atau setiap/semua.
 * CD [cardinal number]: angka.
 * PR [personal pronoun]: kata ganti orang.
+* NEG [negation]: negasi
 
 POS tag yang perlu dibuang:
 
