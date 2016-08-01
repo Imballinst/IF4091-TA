@@ -419,13 +419,8 @@ public class StringProcessor {
      */
     public static void main(String[] args) throws SQLException {
         StringProcessor sp = new StringProcessor();
-        String s = "Pada hakikatnya, seorang bayi yang baru lahir tergolong suci.";
-        String t = "Pada hakikatnya, seorang bayi yang baru lahir tergolong bersih.";
-        
-//        ArrayList<String[]> str = IndonesianPOSTagger.doPOSTag(t);
-//        for(String[] xs : str) {
-//            System.out.println(xs[0] + " " + xs[1]);
-//        }
+        String s = args[0];
+        String t = args[1];
         
         sp.compareSentence(s, t);
     }

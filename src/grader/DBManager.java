@@ -71,7 +71,7 @@ public final class DBManager {
     }
     
     /**
-     *
+     * 
      * @param questionID
      * @return
      * @throws SQLException
