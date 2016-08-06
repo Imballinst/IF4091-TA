@@ -77,6 +77,15 @@ public class SimilarityOutput {
     public ArrayList<String[]> getRealAnswer() {
         return realAnswer;
     }
+    
+    public ArrayList<String[]> getRealAnswerClone() {
+        ArrayList<String[]> arr = new ArrayList<>();
+        for (int i = 0; i < realAnswer.size(); i++) {
+            arr.add(realAnswer.get(i).clone());
+        }
+        
+        return arr;
+    }
 
     /**
      * @param realAnswer the realAnswer to set
@@ -90,6 +99,15 @@ public class SimilarityOutput {
      */
     public ArrayList<String[]> getUserAnswer() {
         return userAnswer;
+    }
+    
+    public ArrayList<String[]> getUserAnswerClone() {
+        ArrayList<String[]> arr = new ArrayList<>();
+        for (int i = 0; i < userAnswer.size(); i++) {
+            arr.add(userAnswer.get(i).clone());
+        }
+        
+        return arr;
     }
 
     /**

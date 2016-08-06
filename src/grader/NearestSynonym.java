@@ -75,4 +75,32 @@ public class NearestSynonym {
     public void addNearestSynonymPercentage(Double d) {
         nearestSynonymPercentage.add(d);
     }
+    
+    public String getNearestSynonymStringRealAnswer(int idx) {
+        return nearestSynonymString.get(idx)[0];
+    }
+    
+    public String getNearestSynonymStringRealAnswerPOSTag(int idx) {
+        return nearestSynonymString.get(idx)[1];
+    }
+    
+    public String getNearestSynonymStringUserAnswer(int idx) {
+        return nearestSynonymString.get(idx)[2];
+    }
+    
+    public String getNearestSynonymStringUserAnswerPOSTag(int idx) {
+        return nearestSynonymString.get(idx)[3];
+    }
+    
+    public String getNearestSynonymStringSynonymString(int idx) {
+        return nearestSynonymString.get(idx)[4];
+    }
+    
+    public String getNearestSynonymStringSynonymStringPOSTag(int idx) {
+        return nearestSynonymString.get(idx)[5];
+    }
+    
+    public int size() {
+        return nearestSynonymString.size();
+    }
 }
