@@ -79,6 +79,12 @@ class qtype_essayinagrader_edit_form extends question_edit_form {
         $mform->setExpanded('graderinfoheader');
         $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_essayinagrader'),
                 array('rows' => 10), $this->editoroptions);
+
+        // Fourth segment
+        $mform->addElement('header', 'expectedanswerheader', get_string('expectedanswerheader', 'qtype_essayinagrader'));
+        $mform->setExpanded('expectedanswerheader');
+        $mform->addElement('editor', 'expectedanswer', get_string('expectedanswer', 'qtype_essayinagrader'),
+                array('rows' => 10), $this->editoroptions);
     }
 
     protected function data_preprocessing($question) {
@@ -107,6 +113,12 @@ class qtype_essayinagrader_edit_form extends question_edit_form {
         );
         $question->graderinfo['format'] = $question->options->graderinfoformat;
         $question->graderinfo['itemid'] = $draftid;
+
+        // Expected answer
+        $question->expectedanswer = array(
+            'text' => $question->options->expectedanswer,
+            'format' => $question->options->expectedanswerformat,
+        );
 
         $question->responsetemplate = array(
             'text' => $question->options->responsetemplate,

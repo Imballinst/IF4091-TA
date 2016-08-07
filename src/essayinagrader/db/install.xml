@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/essayinagrader/db" VERSION="20160716" COMMENT="XMLDB file for Moodle question/type/essayinagrader"
+<XMLDB PATH="question/type/essayinagrader/db" VERSION="20160807" COMMENT="XMLDB file for Moodle question/type/essayinagrader"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -14,6 +14,7 @@
         <FIELD NAME="attachments" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether, and how many, attachments a student is allowed to include with their response. -1 means unlimited."/>
         <FIELD NAME="attachmentsrequired" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The number of attachments that should be required"/>
         <FIELD NAME="expectedanswer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Expected answer for the essay question"/>
+        <FIELD NAME="expectedanswerformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The text format for expectedanswer."/>
         <FIELD NAME="graderinfo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Information shown to people with permission to manually grade the question, when they are grading."/>
         <FIELD NAME="graderinfoformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The text format for graderinfo."/>
         <FIELD NAME="responsetemplate" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The template to pre-populate student's response field during attempt."/>
@@ -22,6 +23,17 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="mdl_qtype_essayinagradersyns" COMMENT="Synonyms for essayinagrader plugin">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="wordid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Word ID for respecting word and POS tag"/>
+        <FIELD NAME="pos" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="POS tag for respecting word"/>
+        <FIELD NAME="word" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Word with the ID and pos tag from the previous column"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>

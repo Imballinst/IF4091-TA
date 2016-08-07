@@ -64,6 +64,8 @@ class qtype_essayinagrader extends question_type {
             $options->id = $DB->insert_record('qtype_essayinagrader_options', $options);
         }
 
+        $options->expectedanswer = $formdata->expectedanswer['text'];
+        $options->expectedanswerformat = $formdata->expectedanswer['format'];
         $options->responseformat = $formdata->responseformat;
         $options->responserequired = $formdata->responserequired;
         $options->responsefieldlines = $formdata->responsefieldlines;
@@ -84,6 +86,8 @@ class qtype_essayinagrader extends question_type {
         $question->responsefieldlines = $questiondata->options->responsefieldlines;
         $question->attachments = $questiondata->options->attachments;
         $question->attachmentsrequired = $questiondata->options->attachmentsrequired;
+        $question->expectedanswer = $formdata->expectedanswer;
+        $question->expectedanswerformat = $formdata->expectedanswerformat;
         $question->graderinfo = $questiondata->options->graderinfo;
         $question->graderinfoformat = $questiondata->options->graderinfoformat;
         $question->responsetemplate = $questiondata->options->responsetemplate;
