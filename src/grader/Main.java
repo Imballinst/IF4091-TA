@@ -16,6 +16,7 @@
 package grader;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -24,8 +25,8 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) throws SQLException {
         StringProcessor sp = new StringProcessor();
-        String a = "Budi adalah manusia";
-        String b = "Budi adalah makhluk";
+        String a = "Budi adalah orang. Kelinci adalah makhluk. Beruang adalah fatwa.";
+        String b = "Budi adalah makhluk. Beruang adalah binatang. Kelinci adalah orangs.";
         sp.compareSentence(a, b);
     }
 }

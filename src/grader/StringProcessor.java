@@ -155,11 +155,16 @@ public class StringProcessor {
         int charIdx = 0;
         int maxIdx = 2; // POS tag longer than 2 characters are just more specific
         
-        while (isSame && charIdx < maxIdx) {
-            if(posTag1.charAt(charIdx) != posTag2.charAt(charIdx)) {
-                isSame = false;
+        // Handle single stopword
+        if (posTag1.length() == 1 && posTag2.length() == 1) {
+            isSame = (posTag1.compareTo(posTag2) == 0);
+        } else {
+            while (isSame && charIdx < maxIdx) {
+                if(posTag1.charAt(charIdx) != posTag2.charAt(charIdx)) {
+                    isSame = false;
+                }
+                charIdx++;
             }
-            charIdx++;
         }
         
         return isSame;
@@ -221,7 +226,6 @@ public class StringProcessor {
         similarity.setSimilarityPercentage(similarity.getSimilarityPercentage() + ((double) countSame / (double) defaultComparatorSize));
         
         System.out.println("Excessive: " + similarity.getExcessivePOSWord());
-        System.out.println("Similarity ATM: " + similarity.getSimilarityPercentage());
         System.out.println("***");     
         return similarity;
     }
@@ -256,11 +260,9 @@ public class StringProcessor {
                     k = 0;
                     nearestStringValue = 0d;
                     nearestString = new String[6];
-                    synonyms = dbm.getSynonyms(realAnswer.get(j)[0], realAnswer.get(j)[1]);
-                    System.out.println("Syns size of " + realAnswer.get(j)[0] + " " + realAnswer.get(j)[1] + ": " + synonyms.size());
+                    synonyms = dbm.getSynonyms(realAnswer.get(i)[0], realAnswer.get(i)[1]);
                     while (k < synonyms.size() && !resetCycle) {
                         // Compare i with k, because i and j were compared already
-                        System.out.println(realAnswer.get(i)[0] + "-" + realAnswer.get(i)[1] + " " + synonyms.get(k)[0] + "-" + synonyms.get(k)[1]);
                         if (isSame(userAnswer.get(i), synonyms.get(k))) {
                             System.out.println("Found the same synonym");
                             realAnswer.remove(i);
@@ -275,11 +277,11 @@ public class StringProcessor {
 
                             if (temp > nearestStringValue) {
                                 // Real answer string and pos tag
-                                nearestString[0] = realAnswer.get(j)[0];
-                                nearestString[1] = realAnswer.get(j)[1];
+                                nearestString[0] = realAnswer.get(i)[0];
+                                nearestString[1] = realAnswer.get(i)[1];
                                 // User answer string and pos tag
-                                nearestString[2] = userAnswer.get(i)[0];
-                                nearestString[3] = userAnswer.get(i)[1];
+                                nearestString[2] = userAnswer.get(j)[0];
+                                nearestString[3] = userAnswer.get(j)[1];
                                 // Synonyms string and pos tag
                                 nearestString[4] = synonyms.get(k)[0];
                                 nearestString[5] = synonyms.get(k)[1];
@@ -309,7 +311,6 @@ public class StringProcessor {
         }
         
         System.out.println("Excessive: " + similarity.getExcessivePOSWord());
-        System.out.println("Similarity ATM: " + similarity.getSimilarityPercentage());
         System.out.println("***");
         return similarity;
     }
@@ -320,15 +321,15 @@ public class StringProcessor {
      * @return
      */
     public SimilarityOutput getThirdSimilarity (SimilarityOutput similarityOutput) {
-        for(int i = 0; i < similarityOutput.getNearestSynonym().getNearestSynonymString().size(); i++) {
-            System.out.println("lel: " + similarityOutput.getNearestSynonym().getNearestSynonymStringRealAnswer(i) + "-" + 
-                    similarityOutput.getNearestSynonym().getNearestSynonymStringRealAnswerPOSTag(i) + " " + 
-                    similarityOutput.getNearestSynonym().getNearestSynonymStringUserAnswer(i) + "-" +
-                    similarityOutput.getNearestSynonym().getNearestSynonymStringUserAnswerPOSTag(i) + " " +
-                    similarityOutput.getNearestSynonym().getNearestSynonymStringSynonymString(i) + "-" +
-                    similarityOutput.getNearestSynonym().getNearestSynonymStringSynonymStringPOSTag(i) + " " +
-                    similarityOutput.getNearestSynonym().getNearestSynonymPercentage().get(i));
-        }
+//        for(int i = 0; i < similarityOutput.getNearestSynonym().getNearestSynonymString().size(); i++) {
+//            System.out.println("lel: " + similarityOutput.getNearestSynonym().getNearestSynonymStringRealAnswer(i) + "-" + 
+//                    similarityOutput.getNearestSynonym().getNearestSynonymStringRealAnswerPOSTag(i) + " " + 
+//                    similarityOutput.getNearestSynonym().getNearestSynonymStringUserAnswer(i) + "-" +
+//                    similarityOutput.getNearestSynonym().getNearestSynonymStringUserAnswerPOSTag(i) + " " +
+//                    similarityOutput.getNearestSynonym().getNearestSynonymStringSynonymString(i) + "-" +
+//                    similarityOutput.getNearestSynonym().getNearestSynonymStringSynonymStringPOSTag(i) + " " +
+//                    similarityOutput.getNearestSynonym().getNearestSynonymPercentage().get(i));
+//        }
         
         // Jaro Winkler
         SimilarityOutput similarity = new SimilarityOutput(similarityOutput);
@@ -339,28 +340,8 @@ public class StringProcessor {
         JaroWinkler jaroWinkler = new JaroWinkler();
         String realSentence = "", userSentence = "", realSentenceRepl = "", userSentenceRepl = "";
         
-        // Replace synonym word with better one
-        NearestSynonym tempNS = similarityOutput.getNearestSynonym();
-        double tempDouble = 0d;
-        
         // POS tag constant
         double posTagConstant = 1 - ((double) similarityOutput.getBasePOSTagCountSame() / (double) similarityOutput.getBasePOSTagSize());
-        System.out.println("POStagCS: " + similarityOutput.getBasePOSTagCountSame());
-        System.out.println("POStagBS: " + similarityOutput.getBasePOSTagSize());
-        
-        for (int i = 0; i < userAnswerRepl.size(); i++) {
-            // Count jaro-winkler for userAnswer word vs nearestSynonymString, find pairs who have accuracy above 0.85
-            double tmp = jaroWinkler.apply(userAnswerRepl.get(i)[0], tempNS.getNearestSynonymStringSynonymString(i));
-            
-            if(tmp > jaroWinkler.apply(userAnswerRepl.get(i)[0], realAnswer.get(i)[0]) && tmp > 0.85) {
-                System.out.println(userAnswerRepl.get(i)[0] + " " + tempNS.getNearestSynonymStringSynonymString(i) + " " + realAnswer.get(i)[0] + " " + tmp);
-                System.out.println("removed, replaced with synonym percentage value");
-                tempDouble += (tmp * posTagConstant);
-                userAnswerRepl.remove(i);
-                realAnswerRepl.remove(i);
-                i--;
-            }
-        }
         
         // Real
         for (int i = 0; i < realAnswer.size(); i++) {
@@ -377,21 +358,8 @@ public class StringProcessor {
                 userSentence += " ";
             }
         }
-        // With Synonym and value replacement
-        for (int i = 0; i < realAnswerRepl.size(); i++) {
-            realSentenceRepl += realAnswerRepl.get(i)[0];
-            if (i + 1 < realAnswerRepl.size()) {
-                // Add whitespace
-                realSentenceRepl += " ";
-            }
-        }
-        for (int i = 0; i < userAnswerRepl.size(); i++) {
-            userSentenceRepl += userAnswerRepl.get(i)[0];
-            if (i + 1 < userAnswerRepl.size()) {
-                // Add whitespace
-                realSentenceRepl += " ";
-            }
-        }
+        
+        
         
         // Excessive
         double excessivePenalty = 0d;
@@ -412,9 +380,47 @@ public class StringProcessor {
         
         // Jaro-Winkler
         double jw = jaroWinkler.apply(realSentence, userSentence);
-        double jw2 = jaroWinkler.apply(realSentenceRepl, userSentenceRepl);
         
-        System.out.println("jw: " + jw2 + " " + tempDouble);
+        // If there is synonym, try replace
+        NearestSynonym tempNS = new NearestSynonym();
+        double tempDouble = 0d, jw2 = 0d;
+        
+        if (!tempNS.getNearestSynonymString().isEmpty()) {
+            // Replace synonym word with better one
+            tempNS = similarityOutput.getNearestSynonym();
+            tempDouble = 0d;
+
+            for (int i = 0; i < userAnswerRepl.size(); i++) {
+                // Count jaro-winkler for userAnswer word vs nearestSynonymString, find pairs who have accuracy above 0.85
+                double tmp = jaroWinkler.apply(userAnswerRepl.get(i)[0], tempNS.getNearestSynonymStringSynonymString(i));
+
+                if(tmp > jaroWinkler.apply(userAnswerRepl.get(i)[0], realAnswer.get(i)[0]) && tmp > 0.85) {
+                    System.out.println(userAnswerRepl.get(i)[0] + " " + tempNS.getNearestSynonymStringSynonymString(i) + " " + realAnswer.get(i)[0] + " " + tmp);
+                    tempDouble += (tmp * posTagConstant);
+                    userAnswerRepl.remove(i);
+                    realAnswerRepl.remove(i);
+                    i--;
+                }
+            }
+            
+            // With Synonym and value replacement
+            for (int i = 0; i < realAnswerRepl.size(); i++) {
+                realSentenceRepl += realAnswerRepl.get(i)[0];
+                if (i + 1 < realAnswerRepl.size()) {
+                    // Add whitespace
+                    realSentenceRepl += " ";
+                }
+            }
+            for (int i = 0; i < userAnswerRepl.size(); i++) {
+                userSentenceRepl += userAnswerRepl.get(i)[0];
+                if (i + 1 < userAnswerRepl.size()) {
+                    // Add whitespace
+                    realSentenceRepl += " ";
+                }
+            }
+            
+            jw2 = jaroWinkler.apply(realSentenceRepl, userSentenceRepl);
+        }
         
         // Calculate overall
         double similarityOverallReal = similarity.getSimilarityPercentage() + (jw * posTagConstant),
@@ -437,33 +443,107 @@ public class StringProcessor {
     public void compareSentence(String realAnswer, String userAnswer) throws SQLException {
         if (processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).size() == 1) {
             // single sentence
-            if (countWordsBySpaces(realAnswer) > 1 && countWordsBySpaces(userAnswer) > 1) {
-                // more than one
-                SimilarityOutput sim1, sim2, sim3;
-
-                String synthesizedRealAnswer = processFormalizeSentence(realAnswer);
-                String synthesizedUserAnswer = processFormalizeSentence(userAnswer);
-
-                // POS tagging
-                sim1 = getFirstSimilarity(synthesizedRealAnswer, synthesizedUserAnswer);
-                // Synonym
-                sim2 = getSecondSimilarity(sim1);
-                // Jaro Winkler
-                sim3 = getThirdSimilarity(sim2);
-                System.out.println(sim3.getSimilarityPercentage());
-            } else {
-                JaroWinkler jw = new JaroWinkler();
-                System.out.println(jw.apply(realAnswer, userAnswer));
-            }
+            System.out.println("Single sentence score: " + handleSingleSentence(realAnswer, userAnswer));
         } else {
             // multiple sentences
+            System.out.println("Multiple sentence score: " + handleMultipleSentence(realAnswer, userAnswer));
         }
         System.out.println("*** END OF GRADING PROCESS ***");
     }
     
-    public double handleMultipleSentences(String _realAnswer, String _userAnswer) {
-        double similarity = 0d;
+    public double handleSingleSentence(String _realAnswer, String _userAnswer) throws SQLException {
+        if (countWordsBySpaces(_realAnswer) > 2 && countWordsBySpaces(_userAnswer) > 2) {
+            // more than one word
+            SimilarityOutput sim1, sim2, sim3;
         
-        return similarity;
+            String synthesizedRealAnswer = processFormalizeSentence(_realAnswer);
+            String synthesizedUserAnswer = processFormalizeSentence(_userAnswer);
+            // POS tagging
+            sim1 = getFirstSimilarity(synthesizedRealAnswer, synthesizedUserAnswer);
+            // Synonym
+            sim2 = getSecondSimilarity(sim1);
+            // Jaro Winkler
+            sim3 = getThirdSimilarity(sim2);
+
+            return sim3.getSimilarityPercentage();
+        } else {
+            JaroWinkler jw = new JaroWinkler();
+            return jw.apply(_realAnswer, _userAnswer);
+        }
+    }
+    
+    public double handleMultipleSentence(String _realAnswer, String _userAnswer) throws SQLException {
+        
+        // Matrix
+        ArrayList<ArrayList<Double>> arrStrValue = new ArrayList<>();
+        ArrayList<String> realAns = new ArrayList<>(), userAns = new ArrayList<>();
+        
+        realAns = processSplitSentence(_realAnswer);
+        userAns = processSplitSentence(_userAnswer);
+        
+        double avgScore = 0d;
+        int pairs = 0;
+        
+        // Fill matrices
+        for (int i = 0; i < realAns.size(); i++) {
+            ArrayList<Double> tmp = new ArrayList<>();
+            for (int j = 0; j < userAns.size(); j++) {
+                double val = handleSingleSentence(realAns.get(i), userAns.get(j));
+                tmp.add(val);
+            }
+            arrStrValue.add(tmp);
+        }
+        
+        System.out.println("*** MATRIX ***");
+        for (int i = 0; i < arrStrValue.size(); i++) {
+            for (int j = 0; j < arrStrValue.get(i).size(); j++) {
+                System.out.print(arrStrValue.get(i).get(j) + " ");
+            }
+            System.out.println("");
+        }
+        System.out.println("*** END MATRIX ***");
+        
+        // Find index max
+        int rowLimit = arrStrValue.size();
+        
+        for (int i = 0; i < rowLimit; i++) {
+            int colLimit = arrStrValue.get(i).size();
+            boolean removedUserAns = false;
+            // real ans array
+            double maxRow = 0d;
+            int maxId = 0;
+            for (int j = 0; j < arrStrValue.get(i).size(); j++) {
+                // user ans array
+                if (arrStrValue.get(i).get(j) > maxRow) {
+                    maxRow = arrStrValue.get(i).get(j);
+                    maxId = j;
+                }
+            }
+            
+            // the maxId is fixed already, remove maxId from the rest of the table
+            for (int k = i; k < rowLimit; k++) {
+                boolean found = false;
+                int l = 0;
+                while (!found && l < colLimit) {
+                    if (l == maxId) {
+                        if(!removedUserAns) {
+                            System.out.println("Removed user answer " + userAns.get(l) + " of value " + arrStrValue.get(k).get(l));
+                            avgScore += arrStrValue.get(k).get(l);
+                            pairs++;
+                            userAns.remove(l);
+                            removedUserAns = true;
+                        }
+                        arrStrValue.get(k).remove(l);
+                        found = true;
+                    }
+                    l++;
+                }
+            }
+        }
+        
+        System.out.println(avgScore + " " + pairs);
+        System.out.println("***");
+        // Remove column with max index
+        return (avgScore / pairs);
     }
 }
