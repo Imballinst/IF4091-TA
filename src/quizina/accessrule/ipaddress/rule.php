@@ -15,18 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Implementaton of the quizaccess_ipaddress plugin.
+ * Implementaton of the quizinaaccess_ipaddress plugin.
+ * Extended from The Open University's quiz access code (2011).
  *
- * @package    quizaccess
+ * @package    quizinaaccess
  * @subpackage ipaddress
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
+require_once($CFG->dirroot . '/mod/quizina/accessrule/accessrulebase.php');
 
 
 /**
@@ -35,21 +36,21 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
  * @copyright  2009 Tim Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class quizaccess_ipaddress extends quiz_access_rule_base {
+class quizinaaccess_ipaddress extends quizina_access_rule_base {
 
-    public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
-        if (empty($quizobj->get_quiz()->subnet)) {
+    public static function make(quizina $quizinaobj, $timenow, $canignoretimelimits) {
+        if (empty($quizinaobj->get_quizina()->subnet)) {
             return null;
         }
 
-        return new self($quizobj, $timenow);
+        return new self($quizinaobj, $timenow);
     }
 
     public function prevent_access() {
-        if (address_in_subnet(getremoteaddr(), $this->quiz->subnet)) {
+        if (address_in_subnet(getremoteaddr(), $this->quizina->subnet)) {
             return false;
         } else {
-            return get_string('subnetwrong', 'quizaccess_ipaddress');
+            return get_string('subnetwrong', 'quizinaaccess_ipaddress');
         }
     }
 }

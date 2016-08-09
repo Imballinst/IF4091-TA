@@ -16,10 +16,11 @@
 
 /**
  * Version information for the quizaccess_ipaddress plugin.
+ * Extended from The Open University's quiz access code (2011).
  *
- * @package    quizaccess
+ * @package    quizinaaccess
  * @subpackage ipaddress
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,4 +30,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2016052300;
 $plugin->requires  = 2016051900;
-$plugin->component = 'quizaccess_ipaddress';
+$plugin->component = 'quizinaaccess_ipaddress';

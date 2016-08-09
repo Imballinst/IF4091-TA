@@ -16,10 +16,11 @@
 
 /**
  * Strings for the quizaccess_delaybetweenattempts plugin.
+ * Extended from The Open University's quiz access code (2011).
  *
- * @package    quizaccess
+ * @package    quizinaaccess
  * @subpackage delaybetweenattempts
- * @copyright  2011 The Open University
+ * @copyright  2016 Try Ajitiono
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
