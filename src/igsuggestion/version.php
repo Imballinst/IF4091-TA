@@ -15,16 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Quiz overview report version information.
- * Extended from Jamie Pratt's quiz overview code (2008).
+ * Quiz cbmgrades report version information.
+ * Extended from Jean-Michel responses plugin code (2008)
  *
- * @package   quiz_inagradesuggestion
+ * @package   quiz_igsuggestion
  * @copyright 2016 Try Ajitiono
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2016052300;
-$plugin->requires = 2016051900;
-$plugin->component = 'quiz_inagradesuggestion';
+$plugin->version   = 2016062703;
+$plugin->requires  = 2016051900;
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->component = 'quiz_igsuggestion';

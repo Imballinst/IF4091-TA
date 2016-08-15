@@ -15,31 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Quiz overview report upgrade script.
- * Extended from Jamie Pratt's quiz report overview code (2008). 
+ * Strings for component 'quiz_igsuggestion', language 'en', branch 'MOODLE_20_STABLE'
+ * Extended from Martin Dougiamas cbm grades' code (1999)
  *
- * @package   quiz_inagradesuggestion
+ * @package   quiz_igsuggestion
  * @copyright 2016 Try Ajitiono
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Quiz inagradesuggestion report upgrade function.
- * @param number $oldversion
- */
-function xmldb_quiz_inagradesuggestion_upgrade($oldversion) {
-    global $CFG;
-
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    return true;
-}
+$string['pluginname'] = 'Indonesian Essay Grade Suggestion';
