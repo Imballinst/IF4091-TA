@@ -152,7 +152,7 @@ class quiz_igsuggestion_report extends quiz_attempts_report {
                     echo '<div>' . $strattempthighlight . '</div>';
                 }
                 echo '<div><b>' . get_string( ($this->showchosenrs ? 'scoreschosenrs' : 'scoreswhole'), 'quiz_igsuggestion') . '</b> &nbsp; ';
-                echo html_writer::tag('i', get_string('cbmexplanations', 'quiz_igsuggestion') . $OUTPUT->help_icon('igsuggestion', 'quiz_igsuggestion')) . '</div>';
+                echo html_writer::tag('i', get_string('cbmexplanations', 'quiz_igsuggestion') . $OUTPUT->help_icon('igsuggestion_help', 'quiz_igsuggestion')) . '</div>';
             }
 
             // Define table columns.
@@ -211,6 +211,10 @@ class quiz_igsuggestion_report extends quiz_attempts_report {
 
             $table->out($options->pagesize, true);
         }
+        
+        // exec('java -jar '.getcwd().'\report\overview\testApp.jar 2>&1', $output);
+        // echo $output[0];
+
         return true;
     }
 }

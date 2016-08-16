@@ -24,3 +24,37 @@
  */
 
 $string['pluginname'] = 'Indonesian Essay Grade Suggestion';
+$string['accy'] = 'Accuracy';
+$string['cbm_accy'] = 'CB Accuracy';
+$string['cbm_av'] = 'Avg (max=3)';
+$string['cbm_bonus'] = 'CB Bonus';
+$string['cbmexplanations'] = 'Indonesian Grade Suggestion Explanations: ';
+$string['cbmgrade'] = 'CB Grade';
+$string['igsuggestion'] = 'Indonesian Grade Suggestion';
+$string['igsuggestion_help'] = 'With Certainty Based Marking (CBM), all correct at C=1 (low certainty)
+        will give a Moodle Grade of 100%. Grades may be as high as 300% if every question is correct with C=3
+       (high certainty). Simple Moodle Grades with CBM are not easily compared with Grades without CBM,
+        unless converted to CB Grades (below).
+
+**Accuracy** is the percentage correct, ignoring certainty but weighted with the max values assigned to each question.
+        If the student successfully distinguishes more and less reliable answers, this is reflected in a **CB Bonus**,
+        which  is positive if the total marks are higher than could be obtained with the same answers at uniform certainty.
+        The **CB Accuracy** (=Accuracy + Bonus) is the clearest measure of knowledge. The **CB Grade** is the
+        CB Accuracy multiplied by the maximum grade assigned to the quiz.';
+$string['igsuggestion_link'] = 'qbehaviour/deferredcbm/certaintygrade';
+$string['igsuggestiondownload'] = 'CBM download';
+$string['igsuggestionfilename'] = 'igsuggestion';
+$string['igsuggestionoptions'] = 'CBM Grades options';
+$string['igsuggestionreport'] = 'CBM report';
+$string['igsuggestiontitle'] = 'Indonesian Grade Suggestion';
+$string['chosenresps'] = 'Show scores based on chosen questions rather than the whole quiz. &nbsp; ';
+$string['grade'] = 'Moodle Grade';
+$string['marks'] = 'Mark Total';
+$string['pagesize'] = 'Page size';
+$string['qdata'] = 'Show data for each Q';
+$string['qx'] = 'Q{$a}';
+$string['responses'] = 'Responses';
+$string['responsex'] = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>Q{$a}';
+$string['scoreschosenrs'] = 'Essay Grade Suggestions: using Java grading module to grade any input answer from essayinagrader plugin.';
+$string['scoreswhole'] = 'Essay Grade Suggestions: using Java grading module to grade any input answer from essayinagrader plugin.';
+$string['showthe'] = 'Options:';
