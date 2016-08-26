@@ -15,16 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Quiz overview report version information.
- * Extended from Jamie Pratt' quiz report code (2008).
+ * Post-install script for the quiz grades report.
+ * Extended from Tim Hunt's quiz report code (2013).
  *
  * @package   quiz_igsuggestion
  * @copyright 2016 Try Ajitiono
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2016052300;
-$plugin->requires = 2016051900;
-$plugin->component = 'quiz_igsuggestion';
+
+/**
+ * Post-install script
+ */
+function xmldb_quiz_igsuggestion_install() {
+    global $DB;
+
+    $record = new stdClass();
+    $record->name         = 'igsuggestion';
+    $record->displayorder = '10000';
+
+    $DB->insert_record('quiz_reports', $record);
+}

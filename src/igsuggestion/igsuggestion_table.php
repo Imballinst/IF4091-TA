@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file defines the quiz igsuggestion table.
- * Extended from Jean-Michel responses plugin code (2008)
+ * This file defines the quiz grades table.
+ * Extended from Jamie Pratt's quiz report code (2008).
  *
  * @package   quiz_igsuggestion
  * @copyright 2016 Try Ajitiono
@@ -30,12 +30,14 @@ require_once($CFG->dirroot . '/mod/quiz/report/attemptsreport_table.php');
 
 
 /**
- * This is a table subclass for displaying the quiz igsuggestion report.
- * Derived from the responses plugin (@copyright 2008 Jean-Michel Vedrine)
- * @copyright 2013
+ * This is a table subclass for displaying the quiz grades report.
+ *
+ * @copyright 2008 Jamie Pratt
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_igsuggestion_table extends quiz_attempts_report_table {
+
+    protected $regradedqs = array();
 
     /**
      * Constructor
@@ -48,179 +50,184 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
      * @param array $questions
      * @param moodle_url $reporturl
      */
-    public function __construct($quiz, $context, $qmsubselect, quiz_igsuggestion_options $options,
-            $groupstudents, $students, $questions, $reporturl) {
-        parent::__construct('mod-quiz-report-igsuggestion-report', $quiz, $context,
+    public function __construct($quiz, $context, $qmsubselect,
+            quiz_igsuggestion_options $options, $groupstudents, $students, $questions, $reporturl) {
+        parent::__construct('mod-quiz-report-igsuggestion-report', $quiz , $context,
                 $qmsubselect, $options, $groupstudents, $students, $questions, $reporturl);
     }
 
-    protected function load_question_latest_steps(qubaid_condition $qubaids = null) {
-        if ($qubaids === null) {
-            $qubaids = $this->get_qubaids_condition();
-        }
-        $fields =  "qas.id,
-            qa.id AS questionattemptid,
-            qa.questionusageid,
-            qa.slot,
-            qa.behaviour,
-            qa.questionid,
-            qa.variant,
-            qa.maxmark,
-            qa.minfraction,
-            qa.maxfraction,
-            qa.flagged,
-            qa.questionsummary,
-            qa.rightanswer,
-            qa.responsesummary,
-            qa.timemodified,
-            qas.id AS attemptstepid,
-            qas.sequencenumber,
-            qas.state,
-            qas.fraction,
-            qas.timecreated,
-            qas.userid,
-            (SELECT value FROM {question_attempt_step_data} qasd WHERE qasd.name = '-_rawfraction' AND attemptstepid = (
-                    SELECT MAX(iqas.id)
-                      FROM {question_attempt_steps} iqas
-                      JOIN {question_attempt_step_data} iqasd ON iqasd.attemptstepid = iqas.id
-                     WHERE iqas.questionattemptid = qa.id
-                       AND iqasd.name = '-_rawfraction'
-            )) AS rawfraction";
-
-        $dm = new question_engine_data_mapper();
-        $latesstepdata = $dm->load_questions_usages_latest_steps(
-                $qubaids, array_keys($this->questions), $fields);
-
-        $lateststeps = array();
-        foreach ($latesstepdata as $step) {
-            $lateststeps[$step->questionusageid][$step->slot] = $step;
-        }
-        return $lateststeps;
-    }
-
     public function build_table() {
+        global $DB;
+
         if (!$this->rawdata) {
             return;
         }
+
         $this->strtimeformat = str_replace(',', ' ', get_string('strftimedatetime'));
         parent::build_table();
+
+        // End of adding the data from attempts. Now add averages at bottom.
+        $this->add_separator();
+
+        if ($this->groupstudents) {
+            $this->add_average_row(get_string('groupavg', 'grades'), $this->groupstudents);
+        }
+
+        if ($this->students) {
+            $this->add_average_row(get_string('overallaverage', 'grades'), $this->students);
+        }
     }
 
-    var $num_rs, $num_all, $sumwts, $sumcorr, $sumcbm;
+    /**
+     * Add an average grade over the attempts of a set of users.
+     * @param string $label the title ot use for this row.
+     * @param array $users the users to average over.
+     */
+    protected function add_average_row($label, $users) {
+        global $DB;
+
+        list($fields, $from, $where, $params) = $this->base_sql($users);
+        $record = $DB->get_record_sql("
+                SELECT AVG(quiza.sumgrades) AS grade, COUNT(quiza.sumgrades) AS numaveraged
+                  FROM $from
+                 WHERE $where", $params);
+        $record->grade = quiz_rescale_grade($record->grade, $this->quiz, false);
+
+        if ($this->is_downloading()) {
+            $namekey = 'lastname';
+        } else {
+            $namekey = 'fullname';
+        }
+        $averagerow = array(
+            $namekey    => $label,
+            'sumgrades' => $this->format_average($record),
+            'feedbacktext'=> strip_tags(quiz_report_feedback_for_grade(
+                                        $record->grade, $this->quiz->id, $this->context))
+        );
+
+        if ($this->options->slotmarks) {
+            $dm = new question_engine_data_mapper();
+            $qubaids = new qubaid_join($from, 'quiza.uniqueid', $where, $params);
+            $avggradebyq = $dm->load_average_marks($qubaids, array_keys($this->questions));
+
+            $averagerow += $this->format_average_grade_for_questions($avggradebyq);
+        }
+
+        $this->add_data_keyed($averagerow);
+    }
+
+    /**
+     * Helper userd by {@link add_average_row()}.
+     * @param array $gradeaverages the raw grades.
+     * @return array the (partial) row of data.
+     */
+    protected function format_average_grade_for_questions($gradeaverages) {
+        $row = array();
+
+        if (!$gradeaverages) {
+            $gradeaverages = array();
+        }
+
+        foreach ($this->questions as $question) {
+            if (isset($gradeaverages[$question->slot]) && $question->maxmark > 0) {
+                $record = $gradeaverages[$question->slot];
+                $record->grade = quiz_rescale_grade(
+                        $record->averagefraction * $question->maxmark, $this->quiz, false);
+
+            } else {
+                $record = new stdClass();
+                $record->grade = null;
+                $record->numaveraged = 0;
+            }
+
+            $row['qsgrade' . $question->slot] = $this->format_average($record, true);
+        }
+
+        return $row;
+    }
+
+    /**
+     * Format an entry in an average row.
+     * @param object $record with fields grade and numaveraged
+     */
+    protected function format_average($record, $question = false) {
+        if (is_null($record->grade)) {
+            $average = '-';
+        } else if ($question) {
+            $average = quiz_format_question_grade($this->quiz, $record->grade);
+        } else {
+            $average = quiz_format_grade($this->quiz, $record->grade);
+        }
+
+        if ($this->download) {
+            return $average;
+        } else if (is_null($record->numaveraged) || $record->numaveraged == 0) {
+            return html_writer::tag('span', html_writer::tag('span',
+                    $average, array('class' => 'average')), array('class' => 'avgcell'));
+        } else {
+            return html_writer::tag('span', html_writer::tag('span',
+                    $average, array('class' => 'average')) . ' ' . html_writer::tag('span',
+                    '(' . $record->numaveraged . ')', array('class' => 'count')),
+                    array('class' => 'avgcell'));
+        }
+    }
+
+    protected function submit_buttons() {
+        if (has_capability('mod/quiz:regrade', $this->context)) {
+            echo '<input type="submit" name="regrade" value="' .
+                    get_string('regradeselected', 'quiz_igsuggestion') . '"/>';
+        }
+        parent::submit_buttons();
+    }
 
     public function col_sumgrades($attempt) {
-        $this->calc_scores($attempt); // Must be in 1st column
-        $grade = round($this->quiz->grade * $this->cbm_av, 2);
+        if ($attempt->state != quiz_attempt::FINISHED) {
+            return '-';
+        }
+
+        $grade = quiz_rescale_grade($attempt->sumgrades, $this->quiz);
         if ($this->is_downloading()) {
             return $grade;
         }
-        $gradehtml = '<a href="review.php?q=' . $this->quiz->id . '&amp;attempt=' .
-                $attempt->attempt . '">' . $grade . '</a>';
-        return $gradehtml;
-    }
 
-    public function col_resp_num($attempt) {
-        return $this->num_rs;
-    }
-
-    public function col_marks($attempt) {
-        return $grade=round($this->sumcbm,1);
-    }
-
-    public function col_cbm_av($attempt) {
-        if (!$this->iscbm) {
-            return '-';
-        }
-        return round($this->cbm_av,2);
-    }
-
-    public function col_cbm_avchosen($attempt) {
-        // NB must run before accy, cbm_bonus, cbm_accy when using chosen Rs
-        $this->cbm_av = $this->sumcbm / $this->sumwts;
-        $this->accy = $this->sumcorr / $this->sumwts;
-        $m=max($this->accy, -2+4*$this->accy, -6+9*$this->accy);
-        $this->bonus = 0.1 * ($this->cbm_av - $m);
-        if (!$this->iscbm) {
-            return '-';
-        }
-        return round($this->cbm_av,2);
-    }
-
-    public function col_accy($attempt) {
-        return round(100 * $this->accy,1) . '%';
-    }
-
-    public function col_cbm_bonus($attempt) {
-        if (!$this->iscbm) {
-            return '-';
-        }
-        return round(100 * $this->bonus,1) . '%';
-    }
-
-    public function col_cbm_accy($attempt) {
-        if (!$this->iscbm) {
-            return '-';
-        }
-        return round(100 * ($this->accy + $this->bonus),1) . '%';
-    }
-
-    public function col_cbm_grade($attempt) {
-        if (!$this->iscbm) {
-            return '-';
-        }
-        return round($this->quiz->grade * ($this->accy + $this->bonus),2);
-    }
-
-    public function calc_scores($attempt) {
-        $this->num_rs=0;
-        $this->num_all=0;
-        $this->sumwts=0;
-        $this->sumcorr=0;
-        $this->sumcbm=0;
-        if ($attempt->usageid == 0) return;
-        $this->iscbm=false;
-        foreach($this->questions as $question) {
-            $slot = $question->slot;
-            if (!isset($this->lateststeps[$attempt->usageid][$slot])) {
-                continue;
+        if (isset($this->regradedqs[$attempt->usageid])) {
+            $newsumgrade = 0;
+            $oldsumgrade = 0;
+            foreach ($this->questions as $question) {
+                if (isset($this->regradedqs[$attempt->usageid][$question->slot])) {
+                    $newsumgrade += $this->regradedqs[$attempt->usageid]
+                            [$question->slot]->newfraction * $question->maxmark;
+                    $oldsumgrade += $this->regradedqs[$attempt->usageid]
+                            [$question->slot]->oldfraction * $question->maxmark;
+                } else {
+                    $newsumgrade += $this->lateststeps[$attempt->usageid]
+                            [$question->slot]->fraction * $question->maxmark;
+                    $oldsumgrade += $this->lateststeps[$attempt->usageid]
+                            [$question->slot]->fraction * $question->maxmark;
+                }
             }
-            $stepdata = $this->lateststeps[$attempt->usageid][$slot];
-            $this->num_all += 1;
-            if (!is_null($stepdata->responsesummary)) {
-                if (strpos($stepdata->responsesummary,'['.substr(get_string('certaintyshort1','qbehaviour_deferredcbm'),0,2))>0) {
-                    $this->iscbm=true;
-                }
-                $this->num_rs += 1;
-                $this->sumwts += $stepdata->maxmark;
-                $this->sumcbm += $stepdata->maxmark * $stepdata->fraction;
-                if ($stepdata->state == 'gradedright') {
-                    $f=1;
-                }
-                else if ($stepdata->state == 'gradedpartial') {
-                    if (array_key_exists('rawfraction',$stepdata)) {
-                        $f=$stepdata->rawfraction;
-                    }
-                    else {
-                        $f=0.5; //NB this is a token fraction for partially correct (shd be rawfraction)
-                    }
-                }
-                else $f=0;
-                $this->sumcorr += $f * $stepdata->maxmark;
-            }
+            $newsumgrade = quiz_rescale_grade($newsumgrade, $this->quiz);
+            $oldsumgrade = quiz_rescale_grade($oldsumgrade, $this->quiz);
+            $grade = html_writer::tag('del', $oldsumgrade) . '/' .
+                    html_writer::empty_tag('br') . $newsumgrade;
         }
-        $this->accy = $this->sumcorr / $this->quiz->sumgrades;
-        $this->cbm_av = $this->sumcbm / $this->quiz->sumgrades;
-        $m=max($this->accy, -2+4*$this->accy, -6+9*$this->accy);
-        $this->bonus = 0.1 * ($this->cbm_av - $m);
-        $this->cbm_accy = $this->accy + $this->bonus;
+        return html_writer::link(new moodle_url('/mod/quiz/review.php',
+                array('attempt' => $attempt->attempt)), $grade,
+                array('title' => get_string('reviewattempt', 'quiz')));
     }
 
-    public function data_col($slot, $field, $attempt) {
-        global $CFG;
-
-        if ($attempt->usageid == 0) {
-            return '-';
+    /**
+     * @param string $colname the name of the column.
+     * @param object $attempt the row of data - see the SQL in display() in
+     * mod/quiz/report/igsuggestion/report.php to see what fields are present,
+     * and what they are called.
+     * @return string the contents of the cell.
+     */
+    public function other_cols($colname, $attempt) {
+        if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
+            return null;
         }
+        $slot = $matches[1];
 
         $question = $this->questions[$slot];
         if (!isset($this->lateststeps[$attempt->usageid][$slot])) {
@@ -228,73 +235,84 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
         }
 
         $stepdata = $this->lateststeps[$attempt->usageid][$slot];
+        $state = question_state::get($stepdata->state);
 
-         if (property_exists($stepdata, $field . 'full')) {
-            $value = $stepdata->{$field . 'full'};
+        if ($question->maxmark == 0) {
+            $grade = '-';
+        } else if (is_null($stepdata->fraction)) {
+            if ($state == question_state::$needsgrading) {
+                $grade = get_string('requiresgrading', 'question');
+            } else {
+                $grade = '-';
+            }
         } else {
-            $value = $stepdata->$field;
+            $grade = quiz_rescale_grade(
+                    $stepdata->fraction * $question->maxmark, $this->quiz, 'question');
         }
 
-        if (is_null($value)) {
-            $summary = '-';
-        } else {
-            $summary = round($stepdata->fraction,1);
+        if ($this->is_downloading()) {
+            return $grade;
         }
 
-        if ($this->is_downloading() && $this->is_downloading() != 'xhtml') {
-            return $summary;
-        }
-        $summary = s($summary);
+        if (isset($this->regradedqs[$attempt->usageid][$slot])) {
+            $gradefromdb = $grade;
+            $newgrade = quiz_rescale_grade(
+                    $this->regradedqs[$attempt->usageid][$slot]->newfraction * $question->maxmark,
+                    $this->quiz, 'question');
+            $oldgrade = quiz_rescale_grade(
+                    $this->regradedqs[$attempt->usageid][$slot]->oldfraction * $question->maxmark,
+                    $this->quiz, 'question');
 
-        if ($this->is_downloading() || $field != 'responsesummary') {
-            return $summary;
+            $grade = html_writer::tag('del', $oldgrade) . '/' .
+                    html_writer::empty_tag('br') . $newgrade;
         }
-        $x=strpos($stepdata->responsesummary,'[');
-        if($stepdata->state != 'gradedright'){
-            $x= '<br>' . $stepdata->responsesummary;
-        }
-        else $x='';
-        return $this->make_review_link($summary, $attempt, $slot) . $x;
+
+        return $this->make_review_link($grade, $attempt, $slot);
     }
 
-    public function other_cols($colname, $attempt) {
-         if(preg_match('/^response(\d+)$/', $colname, $matches)) {
-             return $this->data_col($matches[1], 'responsesummary', $attempt);
-         } else return null;
+    public function col_regraded($attempt) {
+        if ($attempt->regraded == '') {
+            return '';
+        } else if ($attempt->regraded == 0) {
+            return get_string('needed', 'quiz_igsuggestion');
+        } else if ($attempt->regraded == 1) {
+            return get_string('done', 'quiz_igsuggestion');
+        }
     }
 
     protected function requires_latest_steps_loaded() {
-        return true;
+        return $this->options->slotmarks;
     }
 
     protected function is_latest_step_column($column) {
-        if (preg_match('/^(?:question|response|right)([0-9]+)/', $column, $matches)) {
+        if (preg_match('/^qsgrade([0-9]+)/', $column, $matches)) {
             return $matches[1];
         }
         return false;
     }
 
-    /**
-     * Get any fields that might be needed when sorting on date for a particular slot.
-     * @param int $slot the slot for the column we want.
-     * @param string $alias the table alias for latest state information relating to that slot.
-     */
     protected function get_required_latest_state_fields($slot, $alias) {
-        global $DB;
-        $sortableresponse = $DB->sql_order_by_text("{$alias}.questionsummary");
-        if ($sortableresponse === "{$alias}.questionsummary") {
-            // Can just order by text columns. No complexity needed.
-            return "{$alias}.questionsummary AS question{$slot},
-                    {$alias}.rightanswer AS right{$slot},
-                    {$alias}.responsesummary AS response{$slot}";
-        } else {
-            // Work-around required.
-            return $DB->sql_order_by_text("{$alias}.questionsummary") . " AS question{$slot},
-                    {$alias}.questionsummary AS question{$slot}full,
-                    " . $DB->sql_order_by_text("{$alias}.rightanswer") . " AS right{$slot},
-                    {$alias}.rightanswer AS right{$slot}full,
-                    " . $DB->sql_order_by_text("{$alias}.responsesummary") . " AS response{$slot},
-                    {$alias}.responsesummary AS response{$slot}full";
+        return "$alias.fraction * $alias.maxmark AS qsgrade$slot";
+    }
+
+    public function query_db($pagesize, $useinitialsbar = true) {
+        parent::query_db($pagesize, $useinitialsbar);
+
+        if ($this->options->slotmarks && has_capability('mod/quiz:regrade', $this->context)) {
+            $this->regradedqs = $this->get_regraded_questions();
         }
+    }
+
+    /**
+     * Get all the questions in all the attempts being displayed that need regrading.
+     * @return array A two dimensional array $questionusageid => $slot => $regradeinfo.
+     */
+    protected function get_regraded_questions() {
+        global $DB;
+
+        $qubaids = $this->get_qubaids_condition();
+        $regradedqs = $DB->get_records_select('quiz_igsuggestion_regrades',
+                'questionusageid ' . $qubaids->usage_id_in(), $qubaids->usage_id_in_params());
+        return quiz_report_index_by_keys($regradedqs, array('questionusageid', 'slot'));
     }
 }

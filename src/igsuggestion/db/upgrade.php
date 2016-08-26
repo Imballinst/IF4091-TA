@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Quiz overview report version information.
- * Extended from Jamie Pratt' quiz report code (2008).
+ * Quiz overview report upgrade script.
+ * Extended from Jamie Pratt's quiz report code (2008).
  *
  * @package   quiz_igsuggestion
  * @copyright 2016 Try Ajitiono
@@ -25,6 +25,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2016052300;
-$plugin->requires = 2016051900;
-$plugin->component = 'quiz_igsuggestion';
+/**
+ * Quiz overview report upgrade function.
+ * @param number $oldversion
+ */
+function xmldb_quiz_igsuggestion_upgrade($oldversion) {
+    global $CFG;
+
+    // Moodle v2.8.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Moodle v2.9.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Moodle v3.0.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    return true;
+}

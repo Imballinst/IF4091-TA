@@ -16,7 +16,7 @@
 
 /**
  * Class to store the options for a {@link quiz_igsuggestion_report}.
- * Extended from Jean-Michel responses plugin code (2008)
+ * Extended from The Open University's quiz report code (2012).
  *
  * @package   quiz_igsuggestion
  * @copyright 2016 Try Ajitiono
@@ -31,39 +31,31 @@ require_once($CFG->dirroot . '/mod/quiz/report/attemptsreport_options.php');
 
 /**
  * Class to store the options for a {@link quiz_igsuggestion_report}.
+ * Extended from The Open University's quiz report code (2012).
  *
- * @copyright 2012 The Open University
+ * @package   quiz_igsuggestion
+ * @copyright 2016 Try Ajitiono
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_igsuggestion_options extends mod_quiz_attempts_report_options {
 
-    /** @var bool whether to show the question text columns. */
-    public $showqtext = false;
+    /** @var bool whether to show only attempt that need regrading. */
+    public $onlyregraded = false;
 
-    /** @var bool whether to show the students' reponse columns. */
-    public $showigsuggestion = true;
-
-    /** @var bool whether to show the scores for chosen Rs only. */
-    public $showqdata = false;
-
-    /** @var bool whether to show the scores for chosen Rs only. */
-    public $showchosenrs = false;
+    /** @var bool whether to show marks for each question (slot). */
+    public $slotmarks = true;
 
     protected function get_url_params() {
         $params = parent::get_url_params();
-        $params['qtext'] = $this->showqtext;
-        $params['resp']  = $this->showigsuggestion;
-        $params['qdata'] = $this->showqdata;
-        $params['chosenrs'] = $this->showchosenrs;
+        $params['onlyregraded'] = $this->onlyregraded;
+        $params['slotmarks']    = $this->slotmarks;
         return $params;
     }
 
     public function get_initial_form_data() {
         $toform = parent::get_initial_form_data();
-        $toform->qtext = $this->showqtext;
-        $toform->resp  = $this->showigsuggestion;
-        $toform->qdata = $this->showqdata;
-        $toform->chosenrs = $this->showchosenrs;
+        $toform->onlyregraded = $this->onlyregraded;
+        $toform->slotmarks    = $this->slotmarks;
 
         return $toform;
     }
@@ -71,47 +63,46 @@ class quiz_igsuggestion_options extends mod_quiz_attempts_report_options {
     public function setup_from_form_data($fromform) {
         parent::setup_from_form_data($fromform);
 
-//        $this->showqtext     = $fromform->qtext;
-        $this->showigsuggestion = 1;
-        $this->showqdata     = $fromform->qdata;
-        $this->showchosenrs     = $fromform->chosenrs;
+        $this->onlyregraded = !empty($fromform->onlyregraded);
+        $this->slotmarks    = $fromform->slotmarks;
     }
 
     public function setup_from_params() {
         parent::setup_from_params();
 
-        $this->showqtext     = optional_param('qtext', $this->showqtext,     PARAM_BOOL);
-        $this->showigsuggestion = optional_param('resp',  $this->showigsuggestion, PARAM_BOOL);
-        $this->showqdata     = optional_param('qdata', $this->showqdata,     PARAM_BOOL);
-        $this->showchosenrs     = optional_param('chosenrs', $this->showchosenrs,     PARAM_BOOL);
+        $this->onlyregraded = optional_param('onlyregraded', $this->onlyregraded, PARAM_BOOL);
+        $this->slotmarks    = optional_param('slotmarks', $this->slotmarks, PARAM_BOOL);
     }
 
     public function setup_from_user_preferences() {
         parent::setup_from_user_preferences();
 
-        $this->showqtext     = get_user_preferences('quiz_report_igsuggestion_qtext', $this->showqtext);
-        $this->showigsuggestion = get_user_preferences('quiz_report_igsuggestion_resp',  $this->showigsuggestion);
-        $this->showqdata     = get_user_preferences('quiz_report_igsuggestion_qdata', $this->showqdata);
-        $this->showchosenrs     = get_user_preferences('quiz_report_igsuggestion_chosenrs', $this->showchosenrs);
+        $this->slotmarks = get_user_preferences('quiz_igsuggestion_slotmarks', $this->slotmarks);
     }
 
     public function update_user_preferences() {
         parent::update_user_preferences();
 
-        set_user_preference('quiz_report_igsuggestion_qtext', $this->showqtext);
-        set_user_preference('quiz_report_igsuggestion_resp',  $this->showigsuggestion);
-        set_user_preference('quiz_report_igsuggestion_qdata', $this->showqdata);
-        set_user_preference('quiz_report_igsuggestion_chosenrs', $this->showchosenrs);
+        if (quiz_has_grades($this->quiz)) {
+            set_user_preference('quiz_igsuggestion_slotmarks', $this->slotmarks);
+        }
     }
 
     public function resolve_dependencies() {
         parent::resolve_dependencies();
 
-        $this->showigsuggestion = true;
+        if ($this->attempts == quiz_attempts_report::ENROLLED_WITHOUT) {
+            $this->onlyregraded = false;
+        }
+
+        if (!$this->usercanseegrades) {
+            $this->slotmarks = false;
+        }
 
         // We only want to show the checkbox to delete attempts
         // if the user has permissions and if the report mode is showing attempts.
-        $this->checkboxcolumn = has_capability('mod/quiz:deleteattempts', context_module::instance($this->cm->id))
+        $this->checkboxcolumn = has_any_capability(
+                array('mod/quiz:regrade', 'mod/quiz:deleteattempts'), context_module::instance($this->cm->id))
                 && ($this->attempts != quiz_attempts_report::ENROLLED_WITHOUT);
     }
 }

@@ -16,7 +16,7 @@
 
 /**
  * This file defines the setting form for the quiz igsuggestion report.
- * Extended from Jean-Michel responses plugin code (2008)
+ * Extended from Jamie Pratt's quiz report code (2008).
  *
  * @package   quiz_igsuggestion
  * @copyright 2016 Try Ajitiono
@@ -31,24 +31,29 @@ require_once($CFG->dirroot . '/mod/quiz/report/attemptsreport_form.php');
 
 /**
  * Quiz igsuggestion report settings form.
+ * Extended from Jamie Pratt's quiz report code (2008).
  *
- * @copyright 2008 Jean-Michel Vedrine
+ * @package   quiz_igsuggestion
+ * @copyright 2016 Try Ajitiono
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_igsuggestion_settings_form extends mod_quiz_attempts_report_form {
 
-    protected function other_preference_fields(MoodleQuickForm $mform) {
-
-        $mform->addGroup(array(
-          $mform->createElement('advcheckbox', 'chosenrs', '', get_string('chosenresps', 'quiz_igsuggestion')),
-          $mform->createElement('advcheckbox', 'qdata', '', get_string('qdata', 'quiz_igsuggestion')),
-          ), 'coloptions', get_string('showthe', 'quiz_igsuggestion'), array(' '), false);
-        $mform->disabledIf('qdata', 'attempts', 'eq', quiz_attempts_report::ENROLLED_WITHOUT);
-        $mform->disabledIf('chosenrs', 'attempts', 'eq', quiz_attempts_report::ENROLLED_WITHOUT);
+    protected function other_attempt_fields(MoodleQuickForm $mform) {
+        if (has_capability('mod/quiz:regrade', $this->_customdata['context'])) {
+            $mform->addElement('advcheckbox', 'onlyregraded', get_string('reportshowonly', 'quiz'),
+                    get_string('optonlyregradedattempts', 'quiz_igsuggestion'));
+            $mform->disabledIf('onlyregraded', 'attempts', 'eq', quiz_attempts_report::ENROLLED_WITHOUT);
+        }
     }
 
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        return $errors;
+    protected function other_preference_fields(MoodleQuickForm $mform) {
+        if (quiz_has_grades($this->_customdata['quiz'])) {
+            $mform->addElement('selectyesno', 'slotmarks',
+                    get_string('showdetailedmarks', 'quiz_igsuggestion'));
+        } else {
+            $mform->addElement('hidden', 'slotmarks', 0);
+            $mform->setType('slotmarks', PARAM_INT);
+        }
     }
 }
