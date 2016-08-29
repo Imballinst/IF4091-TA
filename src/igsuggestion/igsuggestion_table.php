@@ -236,7 +236,7 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
 
         $stepdata = $this->lateststeps[$attempt->usageid][$slot];
         $state = question_state::get($stepdata->state);
-
+        // echo $question->get_response_summary();
         if ($question->maxmark == 0) {
             $grade = '-';
         } else if (is_null($stepdata->fraction)) {
