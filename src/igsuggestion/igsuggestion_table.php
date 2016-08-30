@@ -224,6 +224,8 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
      * @return string the contents of the cell.
      */
     public function other_cols($colname, $attempt) {
+        global $DB;
+
         if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
             return null;
         }
@@ -236,12 +238,17 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
 
         $stepdata = $this->lateststeps[$attempt->usageid][$slot];
         $state = question_state::get($stepdata->state);
-        // echo $question->get_response_summary();
+
+        $user = $DB->get_record('qtype_essayinagrader_options', array('questionid'=>$question->id), 'expectedanswer');
+
+        print_r($user);
+        echo '<br>';
+
         if ($question->maxmark == 0) {
             $grade = '-';
         } else if (is_null($stepdata->fraction)) {
             if ($state == question_state::$needsgrading) {
-                $grade = get_string('requiresgrading', 'question') . $this->get_question($slot)->name;
+                $grade = get_string('requiresgrading', 'question');
             } else {
                 $grade = '-';
             }
