@@ -241,7 +241,7 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
             $grade = '-';
         } else if (is_null($stepdata->fraction)) {
             if ($state == question_state::$needsgrading) {
-                $grade = get_string('requiresgrading', 'question');
+                $grade = get_string('requiresgrading', 'question') . $this->get_question($slot)->name;
             } else {
                 $grade = '-';
             }
