@@ -239,16 +239,37 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
         $stepdata = $this->lateststeps[$attempt->usageid][$slot];
         $state = question_state::get($stepdata->state);
 
-        $user = $DB->get_record('qtype_essayinagrader_options', array('questionid'=>$question->id), 'expectedanswer');
+        $qtype = ($DB->get_record('question', array('id'=>$question->id), 'qtype')->qtype == "essayinagrader");
 
-        print_r($user);
-        echo '<br>';
+        if ($qtype) {
+            $realAnswer = strip_tags($DB->get_record('qtype_essayinagrader_options', array('questionid'=>$question->id), 'expectedanswer')->expectedanswer);
+            $userAnswer = strip_tags($stepdata->responsesummary);
+            $graderDir = getcwd() . "/report/igsuggestion/grader/grader.jar";
+
+            exec("java -jar " . $graderDir . " 2>&1 "
+                . "'" . $realAnswer . "' "
+                . "'" . $userAnswer . "'", $output);
+
+            $stop = false;
+            $i = 0;
+            while (!$stop) {
+                if ($output[$i] == "*** END OF GRADING PROCESS ***") {
+                    $stop = true;
+                } else {
+                    $i++;
+                }
+                // $i contains the latest output, which is the grading value
+            }
+        }
 
         if ($question->maxmark == 0) {
             $grade = '-';
         } else if (is_null($stepdata->fraction)) {
             if ($state == question_state::$needsgrading) {
                 $grade = get_string('requiresgrading', 'question');
+                if ($qtype) {
+                    $grade .= ": " . $output[$i-1];
+                }
             } else {
                 $grade = '-';
             }

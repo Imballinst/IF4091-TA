@@ -86,8 +86,8 @@ class qtype_essayinagrader extends question_type {
         $question->responsefieldlines = $questiondata->options->responsefieldlines;
         $question->attachments = $questiondata->options->attachments;
         $question->attachmentsrequired = $questiondata->options->attachmentsrequired;
-        $question->expectedanswer = $formdata->expectedanswer;
-        $question->expectedanswerformat = $formdata->expectedanswerformat;
+        $question->expectedanswer = $questiondata->options->expectedanswer;
+        $question->expectedanswerformat = $questiondata->options->expectedanswerformat;
         $question->graderinfo = $questiondata->options->graderinfo;
         $question->graderinfoformat = $questiondata->options->graderinfoformat;
         $question->responsetemplate = $questiondata->options->responsetemplate;
