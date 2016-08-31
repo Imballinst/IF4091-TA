@@ -443,10 +443,10 @@ public class StringProcessor {
     public void compareSentence(String realAnswer, String userAnswer) throws SQLException {
         if (processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).size() == 1) {
             // single sentence
-            System.out.println("Single sentence score: " + handleSingleSentence(realAnswer, userAnswer));
+            System.out.println(handleSingleSentence(realAnswer, userAnswer));
         } else {
             // multiple sentences
-            System.out.println("Multiple sentence score: " + handleMultipleSentence(realAnswer, userAnswer));
+            System.out.println(handleMultipleSentence(realAnswer, userAnswer));
         }
         System.out.println("*** END OF GRADING PROCESS ***");
     }
