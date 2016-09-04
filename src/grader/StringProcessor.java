@@ -444,6 +444,11 @@ public class StringProcessor {
         if (processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).size() == 1) {
             // single sentence
             System.out.println(handleSingleSentence(realAnswer, userAnswer));
+        } else if (processSplitSentence(realAnswer).size() == 0 && processSplitSentence(userAnswer).size() == 0) {
+            System.out.println(1);
+        } else if ((processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).size() == 0) ||
+                   (processSplitSentence(realAnswer).size() == 0 && processSplitSentence(userAnswer).size() == 1)) {
+            System.out.println(0);
         } else {
             // multiple sentences
             System.out.println(handleMultipleSentence(realAnswer, userAnswer));
