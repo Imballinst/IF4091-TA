@@ -32,7 +32,7 @@ public final class DBManager {
     private String password = "";
     private String dbms = "mysql";
     private String serverName = "localhost";
-    private String dbName = "testmdl";
+    private String dbName = "moodle";
     private int portNumber = 3306;
     private Connection conn = null;
     
@@ -71,96 +71,6 @@ public final class DBManager {
     }
     
     /**
-     * 
-     * @param questionID
-     * @return
-     * @throws SQLException
-     */
-    public String getExpectedAnswer(int questionID) throws SQLException {
-        PreparedStatement queryStatement = null;
-        String stringStatement = "SELECT expectedanswer FROM mdl_qtype_essayinagrader_options WHERE questionid = ?";
-        
-        ResultSet rs = null;
-        String expectedAnswer = "";
-
-        try {
-            queryStatement = conn.prepareStatement(stringStatement);
-            queryStatement.setInt(1, questionID);
-            
-            rs = queryStatement.executeQuery();
-            
-            while (rs.next()) {
-                expectedAnswer = rs.getString("expectedanswer");
-            }
-        }
-        catch (SQLException ex){
-            
-        }
-        finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException sqlEx) { } // ignore
-                rs = null;
-            }
-            if (queryStatement != null) {
-                try {
-                    queryStatement.close();
-                } catch (SQLException sqlEx) { } // ignore
-                queryStatement = null;
-            }
-        }
-        
-        return expectedAnswer;
-    }
-    
-    /**
-     *
-     * @param questionID
-     * @param questionUsageID
-     * @return
-     * @throws SQLException
-     */
-    public String getResponseSummary(int questionID, int questionUsageID) throws SQLException {
-        PreparedStatement queryStatement = null;
-        String stringStatement = "SELECT responsesummary FROM mdl_question_attempts WHERE questionid = ? AND questionusageid = ?";
-        
-        ResultSet rs = null;
-        String responseSummary = "";
-
-        try {
-            queryStatement = conn.prepareStatement(stringStatement);
-            queryStatement.setInt(1, questionID);
-            queryStatement.setInt(2, questionUsageID);
-            
-            rs = queryStatement.executeQuery();
-            
-            while (rs.next()) {
-                responseSummary = rs.getString("responesSummary");
-            }
-        }
-        catch (SQLException ex){
-            
-        }
-        finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException sqlEx) { } // ignore
-                rs = null;
-            }
-            if (queryStatement != null) {
-                try {
-                    queryStatement.close();
-                } catch (SQLException sqlEx) { } // ignore
-                queryStatement = null;
-            }
-        }
-        
-        return responseSummary;
-    }
-    
-    /**
      *
      * @param word
      * @param pos
@@ -168,8 +78,8 @@ public final class DBManager {
      */
     public ArrayList<String[]> getSynonyms(String word, String pos) {
         PreparedStatement queryStatement = null;
-        String wordStatement = "SELECT wordid FROM mdl_qtype_essayinagrader_synonyms WHERE word = ? AND pos = ?";
-        String wordIDStatement = "SELECT word,pos FROM mdl_qtype_essayinagrader_synonyms WHERE wordid = ? AND word != ? AND pos = ?";
+        String wordStatement = "SELECT wordid FROM mdl_qtype_essayinagrader_syns WHERE word = ? AND pos = ?";
+        String wordIDStatement = "SELECT word,pos FROM mdl_qtype_essayinagrader_syns WHERE wordid = ? AND word != ? AND pos = ?";
         
         ResultSet rs = null;
         int wordID = 0;
