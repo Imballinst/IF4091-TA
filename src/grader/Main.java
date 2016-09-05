@@ -25,8 +25,8 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws SQLException {
         StringProcessor sp = new StringProcessor();
-        String a = args[0];
-        String b = args[1];
+        String a = "Kelinci adalah organisme.";
+        String b = "Kelinci adalah makhluk.";
         sp.compareSentence(a, b);
     }
 }

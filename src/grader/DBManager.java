@@ -78,7 +78,7 @@ public final class DBManager {
      */
     public ArrayList<String[]> getSynonyms(String word, String pos) {
         PreparedStatement queryStatement = null;
-        String wordStatement = "SELECT wordid FROM mdl_qtype_essayinagrader_syns WHERE word = ? AND pos = ?";
+        String wordStatement = "SELECT wordid FROM mdl_qtype_essayinagrader_syns WHERE word LIKE ? AND pos = ?";
         String wordIDStatement = "SELECT word,pos FROM mdl_qtype_essayinagrader_syns WHERE wordid = ? AND word != ? AND pos = ?";
         
         ResultSet rs = null;
@@ -86,17 +86,18 @@ public final class DBManager {
         ArrayList<String[]> synonyms = new ArrayList<>();
         
         try {
+            System.out.println("Getting synonyms");
             // Get wordid from the word
             queryStatement = conn.prepareStatement(wordStatement);
-            queryStatement.setString(1, word);
+            queryStatement.setString(1, "%" + word + "%");
             queryStatement.setString(2, pos);
             
             rs = queryStatement.executeQuery();
             
-            while (rs.next()) {
+            while (rs.next() && wordID == 0) {
                 wordID = rs.getInt("wordid");
             }
-        
+            
             // Get words from the wordid
             queryStatement = conn.prepareStatement(wordIDStatement);
             queryStatement.setInt(1, wordID);
