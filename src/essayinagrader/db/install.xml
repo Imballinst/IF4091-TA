@@ -25,7 +25,7 @@
         <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="mdl_qtype_essayinagradersyns" COMMENT="Synonyms for essayinagrader plugin">
+    <TABLE NAME="qtype_essayinagrader_syns" COMMENT="Synonyms for essayinagrader plugin">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="wordid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Word ID for respecting word and POS tag"/>
