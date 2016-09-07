@@ -253,7 +253,7 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
             $stop = false;
             $i = 0;
             while (!$stop) {
-                if ($output[$i] == "*** END OF GRADING PROCESS ***") {
+                if ($output[$i] == "*** END OF GRADING PROCESS ***" || $output[$i] == NULL) {
                     $stop = true;
                 } else {
                     $i++;
