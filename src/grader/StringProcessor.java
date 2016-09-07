@@ -295,7 +295,7 @@ public class StringProcessor {
                     nearestStringValue = 0d;
                     nearestString = new String[6];
                     synonyms = dbm.getSynonyms(realAnswer.get(i)[0], realAnswer.get(i)[1]);
-                    while (k < synonyms.size() && !resetCycle) {
+                    while (i < userAnswer.size() && k < synonyms.size() && !resetCycle) {
                         // Compare i with k, because i and j were compared already
                         if (isSame(userAnswer.get(i), synonyms.get(k))) {
                             System.out.println("Found the same synonym");
