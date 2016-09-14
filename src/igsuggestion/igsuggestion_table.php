@@ -244,7 +244,11 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
         if ($qtype) {
             $realAnswer = strip_tags($DB->get_record('qtype_essayinagrader_options', array('questionid'=>$question->id), 'expectedanswer')->expectedanswer);
             $userAnswer = trim(strip_tags($stepdata->responsesummary));
-            $graderDir = getcwd() . "/report/igsuggestion/grader/grader.jar";
+            $graderDir = getcwd() . DIRECTORY_SEPARATOR .
+                         "report" . DIRECTORY_SEPARATOR . 
+                         "igsuggestion" . DIRECTORY_SEPARATOR .
+                         "grader" . DIRECTORY_SEPARATOR . 
+                         "grader.jar";
 
             exec("java -jar " . $graderDir . " 2>&1 "
                 . "\"" . $realAnswer . "\" "
