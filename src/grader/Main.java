@@ -25,8 +25,8 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws SQLException {
         StringProcessor sp = new StringProcessor();
-        String a = args[0];
-        String b = args[1];
+        String a = "Ibu kota dari provinsi Jawa Barat adalah Bandung.";
+        String b = "Ibu kota dari provinsi Jawa Barat adalah Bandung. Ibu kota dari provinsi Jawa Tengah adalah Semarang. Ibu kota dari provinsi Jawa Timur adalah Surabaya.";
         sp.compareSentence(a, b);
     }
 }
