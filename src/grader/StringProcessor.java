@@ -522,6 +522,7 @@ public class StringProcessor {
         
         double avgScore = 0d;
         int pairs = 0;
+        int defaultSize = realAns.size();
         
         // Fill matrices
         for (int i = 0; i < realAns.size(); i++) {
@@ -583,6 +584,6 @@ public class StringProcessor {
         System.out.println(avgScore + " " + pairs);
         System.out.println("***");
         // Remove column with max index
-        return (avgScore / pairs);
+        return ((avgScore / pairs) / defaultSize);
     }
 }
