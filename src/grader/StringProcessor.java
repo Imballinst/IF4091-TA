@@ -175,51 +175,6 @@ public class StringProcessor {
      * @param str2
      * @return
      */
-    public static String difference(String str1, String str2) {
-        if (str1 == null) {
-            return str2;
-        }
-        if (str2 == null) {
-            return str1;
-        }
-        int at = indexOfDifference(str1, str2);
-        if (at == -1) {
-            return null;
-        }
-        return str2.substring(at);
-    }
-    
-    /**
-     *
-     * @param str1
-     * @param str2
-     * @return
-     */
-    public static int indexOfDifference(String str1, String str2) {
-        if (str1 == str2) {
-            return -1;
-        }
-        if (str1 == null || str2 == null) {
-            return 0;
-        }
-        int i;
-        for (i = 0; i < str1.length() && i < str2.length(); ++i) {
-            if (str1.charAt(i) != str2.charAt(i)) {
-                break;
-            }
-        }
-        if (i < str2.length() || i < str1.length()) {
-            return i;
-        }
-        return -1;
-    }
-    
-    /**
-     *
-     * @param str1
-     * @param str2
-     * @return
-     */
     public boolean isSame(String[] str1, String[] str2) {
         return (str1[0].trim().toLowerCase().compareTo(str2[0].trim().toLowerCase()) == 0 && 
                 isPOSTagSame(str1[1], str2[1]));
