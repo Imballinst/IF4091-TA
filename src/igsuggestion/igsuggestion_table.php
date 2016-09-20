@@ -271,15 +271,16 @@ class quiz_igsuggestion_table extends quiz_attempts_report_table {
         } else if (is_null($stepdata->fraction)) {
             if ($state == question_state::$needsgrading) {
                 $grade = get_string('requiresgrading', 'question');
-                if ($qtype) {
-                    $grade .= ": " . $output[$i-1];
-                }
             } else {
                 $grade = '-';
             }
         } else {
             $grade = quiz_rescale_grade(
                     $stepdata->fraction * $question->maxmark, $this->quiz, 'question');
+        }
+
+        if ($qtype) {
+            $grade .= " | " . $output[$i-1];
         }
 
         if ($this->is_downloading()) {
