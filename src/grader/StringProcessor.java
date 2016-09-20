@@ -22,12 +22,30 @@ import IndonesianNLP.IndonesianPOSTagger;
 import IndonesianNLP.IndonesianSentenceFormalization;
 import IndonesianNLP.IndonesianStemmer;
 import IndonesianNLP.IndonesianSentenceDetector;
+import IndonesianNLP.IndonesianSentenceTokenizer;
 
 /**
  *
  * @author Try
  */
 public class StringProcessor {
+    
+    /**
+     *
+     * @param word
+     * @return
+     */
+    public String concatStringArrayList(ArrayList<String> word) {
+        String t = "";
+        
+        for(int i = 0; i < word.size(); i++) {
+            t += word.get(i);
+            if (i + 2 < word.size())
+                t += " ";
+        }
+        
+        return t;
+    }
     
     /**
      *
@@ -50,11 +68,34 @@ public class StringProcessor {
     
     /**
      *
+     * @param word
+     * @return
+     */
+    public String processStemSingle(String word) {
+        IndonesianStemmer stemmer = new IndonesianStemmer();
+        
+        return stemmer.stem(word);
+    }
+    
+    /**
+     *
      * @param sentence
      * @return
      */
     public ArrayList<String[]> processPOSTag(String sentence) {
         ArrayList<String[]> str = IndonesianPOSTagger.doPOSTag(sentence);
+        
+        return str;
+    }
+    
+    /**
+     *
+     * @param sentence
+     * @return
+     */
+    public ArrayList<String> processTokenize(String sentence) {
+        IndonesianSentenceTokenizer tkn = new IndonesianSentenceTokenizer();
+        ArrayList<String> str = tkn.tokenizeSentence(sentence);
         
         return str;
     }
@@ -128,7 +169,12 @@ public class StringProcessor {
         return containsWord;
     }
     
-    
+    /**
+     *
+     * @param str1
+     * @param str2
+     * @return
+     */
     public static String difference(String str1, String str2) {
         if (str1 == null) {
             return str2;
@@ -143,6 +189,12 @@ public class StringProcessor {
         return str2.substring(at);
     }
     
+    /**
+     *
+     * @param str1
+     * @param str2
+     * @return
+     */
     public static int indexOfDifference(String str1, String str2) {
         if (str1 == str2) {
             return -1;
@@ -173,6 +225,12 @@ public class StringProcessor {
                 isPOSTagSame(str1[1], str2[1]));
     }
     
+    /**
+     *
+     * @param realAnswer
+     * @param synonym
+     * @return
+     */
     public boolean isSameWithNearestSynonymString(String[] realAnswer, String[] synonym) {
         return (realAnswer[0].toLowerCase().compareTo(synonym[4].toLowerCase()) == 0 && 
                 isPOSTagSame(realAnswer[1], synonym[5]));
@@ -220,8 +278,22 @@ public class StringProcessor {
      * @return
      */
     public SimilarityOutput getFirstSimilarity (String _realAnswer, String _userAnswer) {
-        ArrayList<String[]> realAnswer = processPOSTag(_realAnswer),
-                            userAnswer = processPOSTag(_userAnswer);
+        ArrayList<String> tokenReal = processTokenize(_realAnswer);
+        ArrayList<String> tokenUser = processTokenize(_userAnswer);
+        for (int i = 0; i < tokenReal.size(); i++) {
+            tokenReal.set(i, processStemSingle(tokenReal.get(i)));
+        }
+        for (int i = 0; i < tokenUser.size(); i++) {
+            tokenUser.set(i, processStemSingle(tokenUser.get(i)));
+        }
+        
+        // Concat
+        String concatTokenReal = concatStringArrayList(tokenReal);
+        String concatTokenUser = concatStringArrayList(tokenUser);
+        
+        // Process POS-tag
+        ArrayList<String[]> realAnswer = processPOSTag(concatTokenReal),
+                            userAnswer = processPOSTag(concatTokenUser);
         
         realAnswer = removeUnimportantWords(realAnswer);
         userAnswer = removeUnimportantWords(userAnswer);
@@ -408,7 +480,7 @@ public class StringProcessor {
         } else {
             // there is excessive word
             excessivePenalty = (double) similarityOutput.getExcessivePOSWord()/ 
-                        (double) (similarityOutput.getBasePOSTagSize() + similarityOutput.getBasePOSTagSize());
+                        (double) (similarityOutput.getBasePOSTagSize() + similarityOutput.getExcessivePOSWord());
                 System.out.println("penaltyb: " + excessivePenalty + " " + similarityOutput.getExcessivePOSWord());
         }
         
@@ -478,10 +550,10 @@ public class StringProcessor {
         if (processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).size() == 1) {
             // single sentence
             System.out.println(handleSingleSentence(realAnswer, userAnswer));
-        } else if (processSplitSentence(realAnswer).size() == 0 && processSplitSentence(userAnswer).size() == 0) {
+        } else if (processSplitSentence(realAnswer).isEmpty() && processSplitSentence(userAnswer).isEmpty()) {
             System.out.println(1);
-        } else if ((processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).size() == 0) ||
-                   (processSplitSentence(realAnswer).size() == 0 && processSplitSentence(userAnswer).size() == 1)) {
+        } else if ((processSplitSentence(realAnswer).size() == 1 && processSplitSentence(userAnswer).isEmpty()) ||
+                   (processSplitSentence(realAnswer).isEmpty() && processSplitSentence(userAnswer).size() == 1)) {
             System.out.println(0);
         } else {
             // multiple sentences
@@ -490,6 +562,13 @@ public class StringProcessor {
         System.out.println("*** END OF GRADING PROCESS ***");
     }
     
+    /**
+     *
+     * @param _realAnswer
+     * @param _userAnswer
+     * @return
+     * @throws SQLException
+     */
     public double handleSingleSentence(String _realAnswer, String _userAnswer) throws SQLException {
         if (countWordsBySpaces(_realAnswer) > 2 && countWordsBySpaces(_userAnswer) > 2) {
             // more than one word
@@ -507,10 +586,35 @@ public class StringProcessor {
             return sim3.getSimilarityPercentage();
         } else {
             JaroWinkler jw = new JaroWinkler();
-            return jw.apply(_realAnswer, _userAnswer);
+            // Tokenize
+            ArrayList<String> tokenReal = new ArrayList<>(), tokenUser = new ArrayList<>();
+            
+            String synthesizedRealAnswer = processFormalizeSentence(_realAnswer);
+            String synthesizedUserAnswer = processFormalizeSentence(_userAnswer);
+            
+            tokenReal = processTokenize(synthesizedRealAnswer);
+            tokenUser = processTokenize(synthesizedUserAnswer);
+            for (int i = 0; i < tokenReal.size(); i++) {
+                tokenReal.set(i, processStemSingle(tokenReal.get(i)));
+            }
+            for (int i = 0; i < tokenUser.size(); i++) {
+                tokenUser.set(i, processStemSingle(tokenUser.get(i)));
+            }
+            // Concat
+            String concatTokenReal = concatStringArrayList(tokenReal);
+            String concatTokenUser = concatStringArrayList(tokenUser);
+            // Grade
+            return jw.apply(concatTokenReal,concatTokenUser);
         }
     }
     
+    /**
+     *
+     * @param _realAnswer
+     * @param _userAnswer
+     * @return
+     * @throws SQLException
+     */
     public double handleMultipleSentence(String _realAnswer, String _userAnswer) throws SQLException {
         
         // Matrix
@@ -523,7 +627,7 @@ public class StringProcessor {
         double avgScore = 0d;
         double pairs = 0;
         double defaultSize = realAns.size();
-        double exceed = Math.abs(defaultSize - userAns.size());
+        double exceed = (defaultSize - userAns.size() >= 0) ? 0 : Math.abs(defaultSize - userAns.size());
         
         // Fill matrices
         for (int i = 0; i < realAns.size(); i++) {
@@ -582,9 +686,12 @@ public class StringProcessor {
             }
         }
         
-        System.out.println(avgScore + " " + pairs);
+        System.out.println(avgScore + " " + pairs + " " + exceed + " " + defaultSize);
         System.out.println("***");
         // Remove column with max index
-        return (((avgScore / pairs) / defaultSize) - (1 / exceed));
+        if (exceed == 0)
+            return (avgScore / defaultSize);
+        else
+            return (avgScore / defaultSize) - (exceed / (exceed + defaultSize));
     }
 }
