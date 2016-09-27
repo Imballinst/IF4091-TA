@@ -78,6 +78,10 @@ public class SimilarityOutput {
         return realAnswer;
     }
     
+    /**
+     *
+     * @return
+     */
     public ArrayList<String[]> getRealAnswerClone() {
         ArrayList<String[]> arr = new ArrayList<>();
         for (int i = 0; i < realAnswer.size(); i++) {
@@ -101,6 +105,10 @@ public class SimilarityOutput {
         return userAnswer;
     }
     
+    /**
+     *
+     * @return
+     */
     public ArrayList<String[]> getUserAnswerClone() {
         ArrayList<String[]> arr = new ArrayList<>();
         for (int i = 0; i < userAnswer.size(); i++) {

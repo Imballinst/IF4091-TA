@@ -23,10 +23,20 @@ import java.util.ArrayList;
  * @author Try
  */
 public class Main {
+
+    /**
+     *
+     * @param args
+     * @throws SQLException
+     */
     public static void main(String[] args) throws SQLException {
+        long startTime = System.currentTimeMillis();
         StringProcessor sp = new StringProcessor();
-        String a = args[0];
-        String b = args[1];
+        String a = "Kelinci adalah organisme.";
+        String b = "Kelinci adalah makhluk.";
         sp.compareSentence(a, b);
+        long endTime   = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println(totalTime);
     }
 }
